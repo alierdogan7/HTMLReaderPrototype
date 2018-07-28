@@ -1,0 +1,540 @@
+@font-face {
+	font-family:"Adobe Naskh Medium";
+	font-style:normal;
+	font-weight:500;
+	src : url("file:///android_asset/font/AdobeNaskh-Medium.otf") format('opentype');
+}
+@font-face {
+	font-family:"Barla © 072 Aria Script";
+	font-style:normal;
+	font-weight:normal;
+	src : url("file:///android_asset/font/Barla 072 Aria Script.ttf") format('truetype');
+}
+@font-face {
+	font-family:Souvenir;
+	font-style:normal;
+	font-weight:bold;
+	src : url("file:///android_asset/font/Barla 012 Souvenir Demi BT.ttf") format('truetype');
+}
+@font-face {
+	font-family:Souvenir;
+	font-style:normal;
+	font-weight:normal;
+	src : url("file:///android_asset/font/Souvenir-Light.otf") format('opentype');
+}
+@font-face {
+	font-family:"Souvenir Lt BT";
+	font-style:italic;
+	font-weight:normal;
+	src : url("file:///android_asset/font/SouvenirLtBT-Italic.ttf") format('truetype');
+}
+@font-face {
+	font-family:"Souvenir Lt BT";
+	font-style:oblique;
+	font-weight:normal;
+	src : url("file:///android_asset/font/SouvenirLtBT-Italic.ttf") format('truetype');
+}
+
+@font-face {
+	font-family:"Liva Nur";
+	font-style:normal;
+	font-weight:normal;
+	src : url("file:///android_asset/font/Barla 001 Liva Nur.ttf") format('truetype');
+}
+body, div, dl, dt, dd, h1, h2, h3, h4, h5, h6, p, pre, code, blockquote {
+	margin:0;
+	padding:0;
+	border-width:0;
+}
+body {
+	-epub-hyphens:auto;
+}
+@page {
+	margin : 0px 0px 0px 0px;
+}
+a._idGenColorInherit {
+	color:inherit;
+}
+img.Basic-Graphics-Frame {
+	border-color:#000000;
+	border-width:1px;
+	border-style:solid;
+}
+p.Alt-Başlık {
+	color:#000000;
+	font-family:"Liva Nur", Souvenir, serif;
+	font-size:0.917em;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:bold;
+	line-height:1.2;
+	margin-bottom:0;
+	margin-left:0;
+	margin-right:0;
+	margin-top:14px;
+	orphans:1;
+	page-break-after:auto;
+	page-break-before:auto;
+	text-align:center;
+	text-decoration:none;
+	text-indent:0;
+	text-transform:none;
+	widows:1;
+}
+p.Arabi {
+	-epub-hyphens:none;
+	-epub-line-break:normal;
+	-webkit-hyphens:none;
+	color:#e31f26;
+	font-family:"Adobe Naskh Medium", serif;
+	font-size:1.25em;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:500;
+	line-height:1.2;
+	margin-bottom:0;
+	margin-left:9px;
+	margin-right:9px;
+	margin-top:6px;
+	orphans:1;
+	page-break-after:auto;
+	page-break-before:auto;
+	text-align:center;
+	text-decoration:none;
+	text-indent:0;
+	text-transform:none;
+	widows:1;
+}
+p.Başlık {
+	color:#000000;
+	font-family:"Souvenir Lt BT Demi", sans-serif;
+	font-size:1.083em;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:normal;
+	line-height:1.2;
+	margin-bottom:3px;
+	margin-left:0;
+	margin-right:0;
+	margin-top:11px;
+	orphans:1;
+	page-break-after:auto;
+	page-break-before:auto;
+	text-align:center;
+	text-decoration:none;
+	text-indent:0;
+	text-transform:none;
+	widows:1;
+}
+p.Paragraf-1 {
+	color:#000000;
+	font-family:Souvenir, serif;
+	font-size:0.917em;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:normal;
+	line-height:1.2;
+	margin-bottom:0;
+	margin-left:0;
+	margin-right:0;
+	margin-top:11px;
+	orphans:1;
+	page-break-after:auto;
+	page-break-before:auto;
+	text-align:left;
+	text-decoration:none;
+	text-indent:0;
+	text-transform:none;
+	widows:1;
+}
+p.Paragraf-2 {
+	color:#000000;
+	font-family:Souvenir, serif;
+	font-size:0.917em;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:normal;
+	line-height:1.2;
+	margin-bottom:0;
+	margin-left:0;
+	margin-right:0;
+	margin-top:0;
+	orphans:1;
+	page-break-after:auto;
+	page-break-before:auto;
+	text-align:left;
+	text-decoration:none;
+	text-indent:0;
+	text-transform:none;
+	widows:1;
+}
+p.sou_h-şiye {
+	color:#000000;
+	font-family:Souvenir, serif;
+	font-size:0.833em;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:normal;
+	line-height:1.2;
+	margin-bottom:0;
+	margin-left:0;
+	margin-right:0;
+	margin-top:3px;
+	orphans:1;
+	page-break-after:auto;
+	page-break-before:auto;
+	text-align:justify;
+	text-decoration:none;
+	text-indent:0;
+	text-transform:none;
+	widows:1;
+}
+span.Arabi-Dahili {
+	color:#e31f26;
+	font-family:"Adobe Naskh Medium", serif;
+	font-size:1.25em;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:500;
+	text-transform:none;
+}
+span.Haşiye {
+	font-family:Souvenir, serif;
+	font-size:0.833em;
+	font-style:normal;
+	font-weight:bold;
+}
+span.Koyu {
+	font-family:Souvenir, serif;
+	font-style:normal;
+	font-weight:bold;
+}
+span.Kırmızı {
+	color:#e31f26;
+}
+span.Mavi {
+	color:#0094d9;
+}
+span.Yatık {
+	font-family:"Souvenir Lt BT", serif;
+	font-style:italic;
+	font-weight:normal;
+}
+span.Yatık-kırmızı {
+	color:#e31f26;
+	font-family:"Souvenir Lt BT", serif;
+	font-style:italic;
+	font-weight:normal;
+}
+p.ParaOverride-1 {
+	page-break-after:always;
+}
+p.ParaOverride-2 {
+	margin-top:9px;
+}
+p.ParaOverride-3 {
+	margin-top:26px;
+	page-break-after:always;
+}
+p.ParaOverride-4 {
+	margin-top:26px;
+}
+p.ParaOverride-5 {
+	margin-top:0px;
+}
+p.ParaOverride-6 {
+	margin-top:6px;
+}
+p.ParaOverride-7 {
+	text-align:center;
+}
+p.ParaOverride-8 {
+	margin-top:11px;
+}
+p.ParaOverride-9 {
+	margin-bottom:3px;
+}
+p.ParaOverride-10 {
+	margin-right:3px;
+}
+p.ParaOverride-11 {
+	margin-bottom:6px;
+}
+p.ParaOverride-12 {
+	margin-top:3px;
+}
+p.ParaOverride-13 {
+	margin-top:6px;
+	text-indent:14px;
+}
+p.ParaOverride-14 {
+	margin-top:0px;
+	page-break-after:always;
+	text-indent:14px;
+}
+p.ParaOverride-15 {
+	text-align:justify;
+	text-indent:14px;
+}
+p.ParaOverride-16 {
+	margin-top:6px;
+	text-align:justify;
+	text-indent:14px;
+}
+p.ParaOverride-17 {
+	margin-top:14px;
+}
+p.ParaOverride-18 {
+	margin-top:17px;
+}
+p.ParaOverride-19 {
+	-epub-hyphens:none;
+	-webkit-hyphens:none;
+	page-break-after:always;
+}
+p.ParaOverride-20 {
+	-epub-hyphens:none;
+	-webkit-hyphens:none;
+}
+p.ParaOverride-21 {
+	margin-top:17px;
+	page-break-after:always;
+}
+p.ParaOverride-22 {
+	margin-bottom:6px;
+	margin-top:3px;
+}
+p.ParaOverride-23 {
+	page-break-after:always;
+	text-align:center;
+}
+p.ParaOverride-24 {
+	margin-top:7px;
+}
+p.ParaOverride-25 {
+	margin-left:0px;
+	margin-right:0px;
+	margin-top:14px;
+}
+p.ParaOverride-26 {
+	margin-top:20px;
+}
+p.ParaOverride-27 {
+	text-align:justify;
+}
+p.ParaOverride-28 {
+	page-break-after:always;
+	text-align:justify;
+}
+p.ParaOverride-29 {
+	margin-top:0px;
+	text-align:justify;
+}
+p.ParaOverride-30 {
+	margin-top:28px;
+	text-align:justify;
+}
+p.ParaOverride-31 {
+	margin-top:4px;
+}
+p.ParaOverride-32 {
+	margin-top:3px;
+	text-align:justify;
+}
+p.ParaOverride-33 {
+	margin-top:3px;
+	page-break-after:always;
+	text-align:center;
+}
+p.ParaOverride-34 {
+	margin-left:0px;
+	margin-right:0px;
+	margin-top:0px;
+}
+p.ParaOverride-35 {
+	margin-left:0px;
+	margin-top:0px;
+	text-align:left;
+}
+p.ParaOverride-36 {
+	text-align:right;
+}
+p.ParaOverride-37 {
+	margin-bottom:3px;
+	margin-top:0px;
+	page-break-after:always;
+}
+p.ParaOverride-38 {
+	margin-bottom:3px;
+	margin-top:0px;
+}
+span.CharOverride-1 {
+	font-family:"Barla © 072 Aria Script", serif;
+	font-size:2.181em;
+	font-style:normal;
+	font-weight:normal;
+}
+span.CharOverride-2 {
+	font-family:Souvenir;
+	font-style:normal;
+	font-weight:500;
+}
+span.CharOverride-3 {
+	color:#0094d9;
+}
+span.CharOverride-4 {
+	color:#e31f26;
+	font-size:1em;
+	font-variant:normal;
+	text-transform:none;
+}
+span.CharOverride-5 {
+	color:#e31f26;
+}
+span.CharOverride-6 {
+	color:#0094d9;
+	font-size:58%;
+	vertical-align:super;
+}
+span.CharOverride-7 {
+	color:#0094d9;
+	font-size:0.53em;
+	vertical-align:super;
+}
+span.CharOverride-8 {
+	font-size:58%;
+	vertical-align:super;
+}
+span.CharOverride-9 {
+	font-variant:normal;
+	text-transform:uppercase;
+}
+span.CharOverride-10 {
+	font-size:1em;
+	font-variant:normal;
+	text-transform:none;
+}
+span.CharOverride-11 {
+	font-size:1.181em;
+	font-variant:normal;
+	text-transform:uppercase;
+}
+span.CharOverride-12 {
+	font-size:1.091em;
+	font-variant:normal;
+	text-transform:uppercase;
+}
+span.CharOverride-13 {
+	font-variant:normal;
+	text-transform:none;
+}
+span.CharOverride-14 {
+	font-family:Souvenir;
+	font-style:normal;
+	font-weight:normal;
+}
+span.CharOverride-15 {
+	color:#e31f26;
+	font-family:Souvenir;
+	font-style:normal;
+	font-weight:normal;
+}
+span.CharOverride-16 {
+	font-family:Souvenir;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:normal;
+	text-transform:uppercase;
+}
+span.CharOverride-17 {
+	color:#da2128;
+}
+span.CharOverride-18 {
+	color:#ed1c24;
+}
+span.CharOverride-19 {
+	color:#0094d9;
+	font-size:0.525em;
+	vertical-align:super;
+}
+span.CharOverride-20 {
+	font-size:0.9em;
+}
+span.CharOverride-21 {
+	color:#0094d9;
+	font-size:0.554em;
+	vertical-align:super;
+}
+span.CharOverride-22 {
+	font-size:0.95em;
+}
+span.CharOverride-23 {
+	font-size:1.091em;
+}
+span.CharOverride-24 {
+	font-size:1.363em;
+}
+span.CharOverride-25 {
+	font-size:1em;
+}
+span.CharOverride-26 {
+	color:#e31f26;
+	font-family:"Adobe Naskh Medium", serif;
+	font-size:1.363em;
+	font-style:normal;
+	font-weight:500;
+}
+span.CharOverride-27 {
+	color:#000000;
+	font-family:Souvenir, serif;
+	font-size:0.733em;
+	font-style:normal;
+	font-weight:normal;
+}
+span.CharOverride-28 {
+	font-family:Souvenir, serif;
+	font-size:0.733em;
+	font-style:normal;
+	font-weight:normal;
+}
+span.CharOverride-29 {
+	color:#e31f26;
+	font-family:"Adobe Naskh Medium", serif;
+	font-size:1em;
+	font-style:normal;
+	font-variant:normal;
+	font-weight:500;
+	text-transform:none;
+}
+span.CharOverride-30 {
+	color:#e31f26;
+	font-family:"Adobe Naskh Medium", serif;
+	font-size:1.2em;
+	font-style:normal;
+	font-weight:500;
+}
+span.CharOverride-31 {
+	font-size:1.2em;
+}
+span.CharOverride-32 {
+	font-size:0.8em;
+}
+p._idGenParaOverride-1 {
+	page-break-after:always;
+}
+span._idGenCharOverride-1 {
+	font-size:1.363em;
+}
+img._idGenObjectAttribute-1 {
+	height:5px;
+	width:13px;
+}
+div._idGenObjectStyleOverride-1 {
+	border-width:0px;
+}
+hr.HorizontalRule-1 {
+	border-bottom:none;
+	border-left:none;
+	border-right:none;
+	border-top:solid #414042 1px;
+}
