@@ -16,13 +16,27 @@
 	font-weight:bold;
 	src : url("file:///android_asset/font/Barla 012 Souvenir Demi BT.ttf") format('truetype');
 }
+
 @font-face {
+	font-family:Souvenir;
+	font-style:italic;
+	font-weight:normal;
+	src : url("file:///android_asset/font/Barla 012 Souvenir Demi BT.ttf") format('truetype');
+}
+
+@font-face {
+	font-family:Souvenir;
+	font-style:oblique;
+	font-weight:normal;
+	src : url("file:///android_asset/font/Barla 012 Souvenir Demi BT.ttf") format('truetype');
+}
+/* @font-face {
 	font-family:Souvenir;
 	font-style:normal;
 	font-weight:normal;
 	src : url("file:///android_asset/font/Souvenir-Light.otf") format('opentype');
-}
-@font-face {
+} */
+/* @font-face {
 	font-family:"Souvenir Lt BT";
 	font-style:italic;
 	font-weight:normal;
@@ -33,7 +47,7 @@
 	font-style:oblique;
 	font-weight:normal;
 	src : url("file:///android_asset/font/SouvenirLtBT-Italic.ttf") format('truetype');
-}
+} */
 
 @font-face {
 	font-family:"Liva Nur";
@@ -41,6 +55,7 @@
 	font-weight:normal;
 	src : url("file:///android_asset/font/Barla 001 Liva Nur.ttf") format('truetype');
 }
+
 body, div, dl, dt, dd, h1, h2, h3, h4, h5, h6, p, pre, code, blockquote {
 	margin:0;
 	padding:0;
@@ -49,6 +64,19 @@ body, div, dl, dt, dd, h1, h2, h3, h4, h5, h6, p, pre, code, blockquote {
 body {
 	-epub-hyphens:auto;
 }
+
+body#Onuncu_So-z_son {
+    padding: 25px;
+}
+
+hr.sayfaAralik  {
+    border-top-style: solid;
+    border-top-width: 2px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-bottom-style: unset;
+}
+
 @page {
 	margin : 0px 0px 0px 0px;
 }
@@ -62,7 +90,7 @@ img.Basic-Graphics-Frame {
 }
 p.Alt-Başlık {
 	color:#000000;
-	font-family:"Liva Nur", Souvenir, serif;
+	font-family: Souvenir, serif;
 	font-size:0.917em;
 	font-style:normal;
 	font-variant:normal;
@@ -216,13 +244,13 @@ span.Mavi {
 	color:#0094d9;
 }
 span.Yatık {
-	font-family:"Souvenir Lt BT", serif;
+	font-family:"Souvenir Lt BT", Souvenir, serif;
 	font-style:italic;
 	font-weight:normal;
 }
 span.Yatık-kırmızı {
 	color:#e31f26;
-	font-family:"Souvenir Lt BT", serif;
+	font-family:"Souvenir Lt BT", Souvenir, serif;
 	font-style:italic;
 	font-weight:normal;
 }

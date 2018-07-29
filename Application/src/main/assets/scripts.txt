@@ -1,0 +1,45 @@
+for( x in document.getElementsByClassName('Alt-Başlık')) {
+	var inText = document.getElementsByClassName('Alt-Başlık')[x].innerHTML;
+	document.getElementsByClassName('Alt-Başlık')[x].innerHTML = "<a class='fihrist' name='fihrist-" + x + "'>" + inText + "</a>";
+}
+
+
+<hr class="sayfaAralik">
+
+
+for( x in document.getElementsByClassName('sayfaAralik')) {
+	//var inText = document.getElementsByClassName('sayfaAralik')[x].setAttribute("name", "page-" + x);
+	//var pageNumHeader = document.createTextNode("#" + x);
+	document.getElementsByClassName('sayfaAralik')[x].insertAdjacentHTML("afterend", "<a class='pageNumber' name='page-" + x + "'>#" + x + "</a>");
+}
+
+
+for( x in document.getElementsByClassName('Alt-Başlık')) {
+	console.log(document.getElementsByClassName('Alt-Başlık')[x].innerText);
+}
+
+var pageNums = document.getElementsByClassName('pageNumber');
+for(var i = 0; i < pageNums.length; i++) {
+	console.log(pageNums[i].innerText);
+}
+
+//calculate page sizes
+var pageTopElements = document.getElementsByClassName("sayfaAralik");
+var tmpOffset = pageTopElements[0].offsetTop;
+var pageSizes = [];
+var pageTops = [pageTopElements[0].offsetTop];
+for( var i = 1; i < pageTopElements.length; i++) {
+	pageSizes.push(pageTopElements[i].offsetTop - tmpOffset);
+	pageTops.push(pageTopElements[i].offsetTop);
+	tmpOffset = pageTopElements[i].offsetTop;
+}
+{pageSizes, pageTops};
+
+
+//calc page tops
+var pageTopElements = document.getElementsByClassName("sayfaAralik");
+var pageTops = [pageTopElements[0].offsetTop];
+for( var i = 0; i < pageTopElements.length; i++) {
+		pageTops.push(pageTopElements[i].offsetTop);
+}
+pageTops;

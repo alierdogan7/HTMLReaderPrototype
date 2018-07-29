@@ -22,13 +22,22 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,6 +45,17 @@ public class MainActivity extends AppCompatActivity {
     WebView webViewEN;
     WebView webViewTR;
     Context mContext;
+    Button nextButton;
+    Button prevButton;
+    Button zoomPlus;
+    Button zoomMinus;
+    boolean fihristMod = false;
+    int currPage;
+    int currFihrist;
+    ArrayList<Integer> pageSizesWebViewEN;
+    ArrayList<Integer> pageSizesWebViewTR;
+    ArrayList<Integer> pageTopsWebViewTR;
+    ArrayList<Integer> pageTopsWebViewEN;
 
     @SuppressLint("NewApi")
     @Override
@@ -50,41 +70,188 @@ public class MainActivity extends AppCompatActivity {
             mContext = this;
             webViewEN = (WebView)findViewById(R.id.ingWV);
             webViewTR = (WebView)findViewById(R.id.trVW);
+            nextButton = (Button) findViewById(R.id.next);
+            prevButton = (Button) findViewById(R.id.prev);
+            zoomPlus = (Button) findViewById(R.id.zoomPlus);
+            zoomMinus = (Button) findViewById(R.id.zoomMinus);
+            RadioButton fihristRadio = (RadioButton) findViewById(R.id.fihristRadio);
+            RadioGroup group = (RadioGroup) findViewById(R.id.radioGroup);
+            group.setOnCheckedChangeListener((group1, checkedId) -> {
+                if(checkedId == R.id.fihristRadio)
+                    fihristMod = true;
+                else
+                    fihristMod = false;
+            });
+
+            pageSizesWebViewEN = new ArrayList<Integer>();
+            pageSizesWebViewTR  = new ArrayList<Integer>();
+            pageTopsWebViewEN  = new ArrayList<Integer>();
+            pageTopsWebViewTR = new ArrayList<Integer>();
+
+            currPage = 0;
+            currFihrist = 0;
+            nextButton.setOnClickListener((view) -> {
+                if(fihristMod) {
+                    currFihrist++;
+                    webViewEN.evaluateJavascript("location.hash = '#fihrist-" + new String(currFihrist + "") + "';", null);
+                    webViewTR.evaluateJavascript("location.hash = '#fihrist-" + new String(currFihrist + "") + "';", null);
+                }
+                else {
+                    currPage++;
+                    webViewEN.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null);
+                    webViewTR.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null);
+                }
+            });
+            prevButton.setOnClickListener((view) -> {
+                if(fihristMod) {
+                    currFihrist--;
+                    webViewEN.evaluateJavascript("location.hash = '#fihrist-" + new String(currFihrist + "") + "';", null);
+                    webViewTR.evaluateJavascript("location.hash = '#fihrist-" + new String(currFihrist + "") + "';", null);
+                }
+                else {
+                    currPage--;
+                    webViewEN.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null);
+                    webViewTR.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null);
+                }
+            });
+
+            zoomPlus.setOnClickListener( (view) -> {
+                    int newZoom = webViewEN.getSettings().getTextZoom() + 20;
+                    webViewEN.getSettings().setTextZoom(newZoom);
+                    webViewTR.getSettings().setTextZoom(newZoom);
+
+            });
+
+
+            zoomMinus.setOnClickListener( (view) -> {
+                int newZoom = webViewEN.getSettings().getTextZoom() - 20;
+                webViewEN.getSettings().setTextZoom(newZoom);
+                webViewTR.getSettings().setTextZoom(newZoom);
+
+            });
             webViewEN.loadUrl("file:///android_asset/onuncusoz.html");
             webViewEN.getSettings().setBuiltInZoomControls(true);
             webViewEN.getSettings().setDisplayZoomControls(true);
             webViewEN.getSettings().setJavaScriptEnabled(true);
+            webViewTR.getSettings().setJavaScriptEnabled(true);
             webViewTR.getSettings().setBuiltInZoomControls(true);
             webViewTR.getSettings().setDisplayZoomControls(true);
             webViewTR.loadUrl("file:///android_asset/turkce.html");
             webViewEN.setWebViewClient(new WebViewClient() {
                 @Override
                 public void onLoadResource(WebView view, String url) {
+
+                    webViewEN.evaluateJavascript("//calc page tops\n" +
+                            "var pageTopElements = document.getElementsByClassName(\"sayfaAralik\");\n" +
+                            "var pageTops = [];\n" +
+                            "for( var i = 0; i < pageTopElements.length; i++) {\n" +
+                            "\t\tpageTops.push(pageTopElements[i].offsetTop);\n" +
+                            "}\n" +
+                            "pageTops;", (pageTops) -> {
+                            Log.d("EVALJS", pageTops);
+
+                            for(String str: TextUtils.split(pageTops.substring(1,pageTops.length() - 1), ",")) {
+                                pageTopsWebViewEN.add(Integer.parseInt(str));
+                            }
+                    });
 //                    webViewEN.loadUrl("javascript:document.getElementsByClassName('Başlık')[0].style.color='green';");
 //                    webViewEN.evaluateJavascript("document.getElementsByClassName('Paragraf-1')[0].style.fontSize='2em';", null);
-                    webViewEN.getSettings().setTextZoom(200);
 
-                    (new AlertDialog.Builder(mContext)).setTitle("DENEME").setMessage("DENEME")
-                            .setPositiveButton("GOD BUL", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    webViewEN.findAllAsync("god");
-                                    webViewEN.findNext(true);
-                                    webViewEN.findNext(true);
-                                    webViewEN.findNext(true);
-                                    webViewEN.findNext(true);
-                                }
-                            })
-                            .setNegativeButton("8.isarete git", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-//                                    webViewEN.loadUrl("file:///android_asset/onuncusoz.html#sekizinci");
-                                    webViewEN.evaluateJavascript("location.hash = '#sekizinci';", null);
 
-                                }
-                            })
-                            .setCancelable(true)
-                            .create().show();
+//                    (new AlertDialog.Builder(mContext)).setTitle("DENEME").setMessage("DENEME")
+//                            .setPositiveButton("Page Num Test", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int i) {
+////                                    webViewEN.findAllAsync("god");
+////                                    webViewEN.findNext(true);
+////                                        webViewEN.evaluateJavascript("document.getElementsByClassName('pageNumber')", lastPage -> {
+////                                            int currPage = 0;
+////                                            new Timer().schedule(new TimerTask() {
+////                                                @Override
+////                                                public void run() {
+////                                                    runOnUiThread(new Thread() {
+////                                                        if(currPage < Integer.parseInt(lastPage)) {
+////                                                            webViewEN.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null)
+////                                                            webViewTR.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null)
+////                                                        }
+////                                                    });
+////
+////                                                }
+////                                            }, 1000);
+////                                        });
+//                                }
+//                            })
+//                            .setNegativeButton("Fihrist test", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int i) {
+////                                    webViewEN.loadUrl("file:///android_asset/onuncusoz.html#sekizinci");
+//                                    webViewEN.evaluateJavascript("location.hash = '#sekizinci';", null);
+//
+//                                }
+//                            })
+//                            .setCancelable(true);
+////                            .create().show();
+
+                }
+
+            });
+
+            webViewTR.setWebViewClient(new WebViewClient() {
+
+                @Override
+                public void onLoadResource(WebView view, String url) {
+
+
+                    webViewTR.evaluateJavascript("//calc page tops\n" +
+                            "var pageTopElements = document.getElementsByClassName(\"sayfaAralik\");\n" +
+                            "var pageTops = [];\n" +
+                            "for( var i = 0; i < pageTopElements.length; i++) {\n" +
+                            "\t\tpageTops.push(pageTopElements[i].offsetTop);\n" +
+                            "}\n" +
+                            "pageTops;", (pageTops) -> {
+                        Log.d("EVALJS", pageTops);
+                        for(String str: TextUtils.split(pageTops.substring(1,pageTops.length() - 1), ",")) {
+                            pageTopsWebViewTR.add(Integer.parseInt(str));
+                        }
+
+                    });
+//                    webViewEN.loadUrl("javascript:document.getElementsByClassName('Başlık')[0].style.color='green';");
+//                    webViewEN.evaluateJavascript("document.getElementsByClassName('Paragraf-1')[0].style.fontSize='2em';", null);
+
+
+//                    (new AlertDialog.Builder(mContext)).setTitle("DENEME").setMessage("DENEME")
+//                            .setPositiveButton("Page Num Test", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int i) {
+////                                    webViewEN.findAllAsync("god");
+////                                    webViewEN.findNext(true);
+////                                        webViewEN.evaluateJavascript("document.getElementsByClassName('pageNumber')", lastPage -> {
+////                                            int currPage = 0;
+////                                            new Timer().schedule(new TimerTask() {
+////                                                @Override
+////                                                public void run() {
+////                                                    runOnUiThread(new Thread() {
+////                                                        if(currPage < Integer.parseInt(lastPage)) {
+////                                                            webViewEN.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null)
+////                                                            webViewTR.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null)
+////                                                        }
+////                                                    });
+////
+////                                                }
+////                                            }, 1000);
+////                                        });
+//                                }
+//                            })
+//                            .setNegativeButton("Fihrist test", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int i) {
+////                                    webViewEN.loadUrl("file:///android_asset/onuncusoz.html#sekizinci");
+//                                    webViewEN.evaluateJavascript("location.hash = '#sekizinci';", null);
+//
+//                                }
+//                            })
+//                            .setCancelable(true);
+////                            .create().show();
 
                 }
 
@@ -94,7 +261,21 @@ public class MainActivity extends AppCompatActivity {
             webViewEN.setOnScrollChangeListener(new View.OnScrollChangeListener() {
                 @Override
                 public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                    webViewTR.scrollTo(scrollX, scrollY);
+//                    webViewTR.scrollTo(scrollX, scrollY);
+//                    float dy = scrollY - oldScrollY;
+//
+//                    int currentPage = 0;
+//                    for(int i = 0; i < pageTopsWebViewEN.size(); i++) {
+//                        if(scrollY > pageTopsWebViewEN.get(i))
+//                            currentPage = i;
+//                        else
+//                            break;
+//                    }
+//
+//                    int currentPageSize = pageTopsWebViewEN.get(currentPage + 1) - pageTopsWebViewEN.get(currentPage);
+//                    int correspondingPageSize = pageTopsWebViewTR.get(currentPage + 1) - pageTopsWebViewTR.get(currentPage);
+//                    float scrollRatio = dy / currentPageSize;
+//                    webViewTR.scrollTo(scrollX - oldScrollX, webViewTR.getScrollY() + (int) (scrollRatio * correspondingPageSize));
                 }
             });
         }
