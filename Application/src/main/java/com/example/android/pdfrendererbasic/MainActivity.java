@@ -56,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Integer> pageSizesWebViewTR;
     ArrayList<Integer> pageTopsWebViewTR;
     ArrayList<Integer> pageTopsWebViewEN;
+    boolean engLoaded = false;
+    boolean trLoaded = false;
 
     @SuppressLint("NewApi")
     @Override
@@ -129,31 +131,47 @@ public class MainActivity extends AppCompatActivity {
                 webViewTR.getSettings().setTextZoom(newZoom);
 
             });
-            webViewEN.loadUrl("file:///android_asset/onuncusoz.html");
+            webViewEN.loadUrl("file:///android_asset/eng_min.html");
             webViewEN.getSettings().setBuiltInZoomControls(true);
             webViewEN.getSettings().setDisplayZoomControls(true);
             webViewEN.getSettings().setJavaScriptEnabled(true);
             webViewTR.getSettings().setJavaScriptEnabled(true);
             webViewTR.getSettings().setBuiltInZoomControls(true);
             webViewTR.getSettings().setDisplayZoomControls(true);
-            webViewTR.loadUrl("file:///android_asset/turkce.html");
+            webViewTR.loadUrl("file:///android_asset/tr_min.html");
             webViewEN.setWebViewClient(new WebViewClient() {
                 @Override
                 public void onLoadResource(WebView view, String url) {
+                    if(engLoaded)
+                        return;
 
-                    webViewEN.evaluateJavascript("//calc page tops\n" +
-                            "var pageTopElements = document.getElementsByClassName(\"sayfaAralik\");\n" +
-                            "var pageTops = [];\n" +
-                            "for( var i = 0; i < pageTopElements.length; i++) {\n" +
-                            "\t\tpageTops.push(pageTopElements[i].offsetTop);\n" +
-                            "}\n" +
-                            "pageTops;", (pageTops) -> {
-                            Log.d("EVALJS", pageTops);
+                    webViewEN.evaluateJavascript("// JQUERY highlight separate paragraphs\n" +
+                            "var offsets = [];\n" +
+                            "$(\".Paragraf-1\").each( function(index) {\n" +
+                            "\t//var inText = document.getElementsByClassName('sayfaAralik')[x].setAttribute(\"name\", \"page-\" + x);\n" +
+                            "\t//var pageNumHeader = document.createTextNode(\"#\" + x);\n" +
+                            "\t\n" +
+                            "\t$(this).prepend(\"<h3>#\" + index + \"</h3>\");\n" +
+                            "\t$(this).attr(\"name\", \"prg-\" + index);\n" +
+                            "\t$('html, body').animate({ scrollTop: $(\".Paragraf-1\").eq(index).offset().top}, 1000);\n" +
+                            "\t//offsets.push(document.body.scrollTop + elm.getBoundingClientRect().top);\n" +
+                            "} );\n" +
+                            "\n", null);
+                    engLoaded = true;
 
-                            for(String str: TextUtils.split(pageTops.substring(1,pageTops.length() - 1), ",")) {
-                                pageTopsWebViewEN.add(Integer.parseInt(str));
-                            }
-                    });
+//                    webViewEN.evaluateJavascript("//calc page tops\n" +
+//                            "var pageTopElements = document.getElementsByClassName(\"sayfaAralik\");\n" +
+//                            "var pageTops = [];\n" +
+//                            "for( var i = 0; i < pageTopElements.length; i++) {\n" +
+//                            "\t\tpageTops.push(pageTopElements[i].offsetTop);\n" +
+//                            "}\n" +
+//                            "pageTops;", (pageTops) -> {
+//                            Log.d("EVALJS", pageTops);
+//
+//                            for(String str: TextUtils.split(pageTops.substring(1,pageTops.length() - 1), ",")) {
+//                                pageTopsWebViewEN.add(Integer.parseInt(str));
+//                            }
+//                    });
 //                    webViewEN.loadUrl("javascript:document.getElementsByClassName('Başlık')[0].style.color='green';");
 //                    webViewEN.evaluateJavascript("document.getElementsByClassName('Paragraf-1')[0].style.fontSize='2em';", null);
 
@@ -200,21 +218,35 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onLoadResource(WebView view, String url) {
+                if(trLoaded)
+                    return;
 
-
-                    webViewTR.evaluateJavascript("//calc page tops\n" +
-                            "var pageTopElements = document.getElementsByClassName(\"sayfaAralik\");\n" +
-                            "var pageTops = [];\n" +
-                            "for( var i = 0; i < pageTopElements.length; i++) {\n" +
-                            "\t\tpageTops.push(pageTopElements[i].offsetTop);\n" +
-                            "}\n" +
-                            "pageTops;", (pageTops) -> {
-                        Log.d("EVALJS", pageTops);
-                        for(String str: TextUtils.split(pageTops.substring(1,pageTops.length() - 1), ",")) {
-                            pageTopsWebViewTR.add(Integer.parseInt(str));
-                        }
-
-                    });
+                webViewTR.evaluateJavascript("\n" +
+                        "// JQUERY highlight separate paragraphs\n" +
+                        "var offsets = [];\n" +
+                        "$(\".Paragraf-1\").each( function(index) {\n" +
+                        "\t//var inText = document.getElementsByClassName('sayfaAralik')[x].setAttribute(\"name\", \"page-\" + x);\n" +
+                        "\t//var pageNumHeader = document.createTextNode(\"#\" + x);\n" +
+                        "\t\n" +
+                        "\t$(this).prepend(\"<h3>#\" + index + \"</h3>\");\n" +
+                        "\t$(this).attr(\"name\", \"prg-\" + index);\n" +
+                        "\t$('html, body').animate({ scrollTop: $(\".Paragraf-1\").eq(index).offset().top}, 1000);\n" +
+                        "\t//offsets.push(document.body.scrollTop + elm.getBoundingClientRect().top);\n" +
+                        "} );",null);
+                trLoaded = true;
+//                    webViewTR.evaluateJavascript("//calc page tops\n" +
+//                            "var pageTopElements = document.getElementsByClassName(\"sayfaAralik\");\n" +
+//                            "var pageTops = [];\n" +
+//                            "for( var i = 0; i < pageTopElements.length; i++) {\n" +
+//                            "\t\tpageTops.push(pageTopElements[i].offsetTop);\n" +
+//                            "}\n" +
+//                            "pageTops;", (pageTops) -> {
+//                        Log.d("EVALJS", pageTops);
+//                        for(String str: TextUtils.split(pageTops.substring(1,pageTops.length() - 1), ",")) {
+//                            pageTopsWebViewTR.add(Integer.parseInt(str));
+//                        }
+//
+//                    });
 //                    webViewEN.loadUrl("javascript:document.getElementsByClassName('Başlık')[0].style.color='green';");
 //                    webViewEN.evaluateJavascript("document.getElementsByClassName('Paragraf-1')[0].style.fontSize='2em';", null);
 
@@ -261,7 +293,16 @@ public class MainActivity extends AppCompatActivity {
             webViewEN.setOnScrollChangeListener(new View.OnScrollChangeListener() {
                 @Override
                 public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-//                    webViewTR.scrollTo(scrollX, scrollY);
+//                    float positionTopView = webViewEN.getTop();
+//                    float contentHeight = webViewEN.getContentHeight();
+//                    float currentScrollPosition = webViewEN.getScrollY();
+//                    float percentWebview = (currentScrollPosition - positionTopView) / contentHeight;
+//
+//                    float webviewsize = webViewTR.getContentHeight() - webViewTR.getTop();
+//                    float positionInWV = webviewsize * percentWebview;
+//                    int positionY = Math.round(webViewTR.getTop() + positionInWV);
+//                    webViewTR.scrollTo(0, scrollY);
+
 //                    float dy = scrollY - oldScrollY;
 //
 //                    int currentPage = 0;

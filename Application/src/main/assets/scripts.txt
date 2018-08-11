@@ -43,3 +43,37 @@ for( var i = 0; i < pageTopElements.length; i++) {
 		pageTops.push(pageTopElements[i].offsetTop);
 }
 pageTops;
+
+
+// highlight separate paragraphs
+var offsets = [];
+for( x in document.getElementsByClassName('Paragraf-1')) {
+	//var inText = document.getElementsByClassName('sayfaAralik')[x].setAttribute("name", "page-" + x);
+	//var pageNumHeader = document.createTextNode("#" + x);
+	
+	var elm = document.getElementsByClassName('Paragraf-1')[x];
+	elm.innerHTML = "<h3>#" + x + "</h3>" + elm.innerHTML;
+	elm.setAttribute("name", "prg-" + x);
+	offsets.push(document.body.scrollTop + elm.getBoundingClientRect().top);
+}
+
+
+// JQUERY highlight separate paragraphs
+var offsets = [];
+$(".Paragraf-1").each( function(index) {
+	//var inText = document.getElementsByClassName('sayfaAralik')[x].setAttribute("name", "page-" + x);
+	//var pageNumHeader = document.createTextNode("#" + x);
+	
+	$(this).prepend("<h3>#" + index + "</h3>");
+	$(this).attr("name", "prg-" + index);
+	$('html, body').animate({ scrollTop: $(".Paragraf-1").eq(index).offset().top}, 1000);
+	//offsets.push(document.body.scrollTop + elm.getBoundingClientRect().top);
+} );
+
+
+
+
+//
+window.outerHeight // page height
+document.body.scrollHeight // total height
+document.body.scrollTop // current scroll offset
