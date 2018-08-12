@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2014 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 package com.example.android.pdfrendererbasic;
 
@@ -139,76 +124,17 @@ public class MainActivity extends AppCompatActivity {
             webViewTR.getSettings().setBuiltInZoomControls(true);
             webViewTR.getSettings().setDisplayZoomControls(true);
             webViewTR.loadUrl("file:///android_asset/tr_min.html");
+
+            webViewEN.addJavascriptInterface(new MyJavaScriptInterface(this), "androidInterface" );
+            webViewTR.addJavascriptInterface(new MyJavaScriptInterface(this), "androidInterface" );
+
             webViewEN.setWebViewClient(new WebViewClient() {
                 @Override
-                public void onLoadResource(WebView view, String url) {
+                public void onPageFinished(WebView view, String url) {
                     if(engLoaded)
                         return;
 
-                    webViewEN.evaluateJavascript("// JQUERY highlight separate paragraphs\n" +
-                            "var offsets = [];\n" +
-                            "$(\".Paragraf-1\").each( function(index) {\n" +
-                            "\t//var inText = document.getElementsByClassName('sayfaAralik')[x].setAttribute(\"name\", \"page-\" + x);\n" +
-                            "\t//var pageNumHeader = document.createTextNode(\"#\" + x);\n" +
-                            "\t\n" +
-                            "\t$(this).prepend(\"<h3>#\" + index + \"</h3>\");\n" +
-                            "\t$(this).attr(\"name\", \"prg-\" + index);\n" +
-                            "\t$('html, body').animate({ scrollTop: $(\".Paragraf-1\").eq(index).offset().top}, 1000);\n" +
-                            "\t//offsets.push(document.body.scrollTop + elm.getBoundingClientRect().top);\n" +
-                            "} );\n" +
-                            "\n", null);
                     engLoaded = true;
-
-//                    webViewEN.evaluateJavascript("//calc page tops\n" +
-//                            "var pageTopElements = document.getElementsByClassName(\"sayfaAralik\");\n" +
-//                            "var pageTops = [];\n" +
-//                            "for( var i = 0; i < pageTopElements.length; i++) {\n" +
-//                            "\t\tpageTops.push(pageTopElements[i].offsetTop);\n" +
-//                            "}\n" +
-//                            "pageTops;", (pageTops) -> {
-//                            Log.d("EVALJS", pageTops);
-//
-//                            for(String str: TextUtils.split(pageTops.substring(1,pageTops.length() - 1), ",")) {
-//                                pageTopsWebViewEN.add(Integer.parseInt(str));
-//                            }
-//                    });
-//                    webViewEN.loadUrl("javascript:document.getElementsByClassName('Başlık')[0].style.color='green';");
-//                    webViewEN.evaluateJavascript("document.getElementsByClassName('Paragraf-1')[0].style.fontSize='2em';", null);
-
-
-//                    (new AlertDialog.Builder(mContext)).setTitle("DENEME").setMessage("DENEME")
-//                            .setPositiveButton("Page Num Test", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialogInterface, int i) {
-////                                    webViewEN.findAllAsync("god");
-////                                    webViewEN.findNext(true);
-////                                        webViewEN.evaluateJavascript("document.getElementsByClassName('pageNumber')", lastPage -> {
-////                                            int currPage = 0;
-////                                            new Timer().schedule(new TimerTask() {
-////                                                @Override
-////                                                public void run() {
-////                                                    runOnUiThread(new Thread() {
-////                                                        if(currPage < Integer.parseInt(lastPage)) {
-////                                                            webViewEN.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null)
-////                                                            webViewTR.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null)
-////                                                        }
-////                                                    });
-////
-////                                                }
-////                                            }, 1000);
-////                                        });
-//                                }
-//                            })
-//                            .setNegativeButton("Fihrist test", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialogInterface, int i) {
-////                                    webViewEN.loadUrl("file:///android_asset/onuncusoz.html#sekizinci");
-//                                    webViewEN.evaluateJavascript("location.hash = '#sekizinci';", null);
-//
-//                                }
-//                            })
-//                            .setCancelable(true);
-////                            .create().show();
 
                 }
 
@@ -217,73 +143,11 @@ public class MainActivity extends AppCompatActivity {
             webViewTR.setWebViewClient(new WebViewClient() {
 
                 @Override
-                public void onLoadResource(WebView view, String url) {
+                public void onPageFinished(WebView view, String url) {
                 if(trLoaded)
                     return;
 
-                webViewTR.evaluateJavascript("\n" +
-                        "// JQUERY highlight separate paragraphs\n" +
-                        "var offsets = [];\n" +
-                        "$(\".Paragraf-1\").each( function(index) {\n" +
-                        "\t//var inText = document.getElementsByClassName('sayfaAralik')[x].setAttribute(\"name\", \"page-\" + x);\n" +
-                        "\t//var pageNumHeader = document.createTextNode(\"#\" + x);\n" +
-                        "\t\n" +
-                        "\t$(this).prepend(\"<h3>#\" + index + \"</h3>\");\n" +
-                        "\t$(this).attr(\"name\", \"prg-\" + index);\n" +
-                        "\t$('html, body').animate({ scrollTop: $(\".Paragraf-1\").eq(index).offset().top}, 1000);\n" +
-                        "\t//offsets.push(document.body.scrollTop + elm.getBoundingClientRect().top);\n" +
-                        "} );",null);
                 trLoaded = true;
-//                    webViewTR.evaluateJavascript("//calc page tops\n" +
-//                            "var pageTopElements = document.getElementsByClassName(\"sayfaAralik\");\n" +
-//                            "var pageTops = [];\n" +
-//                            "for( var i = 0; i < pageTopElements.length; i++) {\n" +
-//                            "\t\tpageTops.push(pageTopElements[i].offsetTop);\n" +
-//                            "}\n" +
-//                            "pageTops;", (pageTops) -> {
-//                        Log.d("EVALJS", pageTops);
-//                        for(String str: TextUtils.split(pageTops.substring(1,pageTops.length() - 1), ",")) {
-//                            pageTopsWebViewTR.add(Integer.parseInt(str));
-//                        }
-//
-//                    });
-//                    webViewEN.loadUrl("javascript:document.getElementsByClassName('Başlık')[0].style.color='green';");
-//                    webViewEN.evaluateJavascript("document.getElementsByClassName('Paragraf-1')[0].style.fontSize='2em';", null);
-
-
-//                    (new AlertDialog.Builder(mContext)).setTitle("DENEME").setMessage("DENEME")
-//                            .setPositiveButton("Page Num Test", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialogInterface, int i) {
-////                                    webViewEN.findAllAsync("god");
-////                                    webViewEN.findNext(true);
-////                                        webViewEN.evaluateJavascript("document.getElementsByClassName('pageNumber')", lastPage -> {
-////                                            int currPage = 0;
-////                                            new Timer().schedule(new TimerTask() {
-////                                                @Override
-////                                                public void run() {
-////                                                    runOnUiThread(new Thread() {
-////                                                        if(currPage < Integer.parseInt(lastPage)) {
-////                                                            webViewEN.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null)
-////                                                            webViewTR.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null)
-////                                                        }
-////                                                    });
-////
-////                                                }
-////                                            }, 1000);
-////                                        });
-//                                }
-//                            })
-//                            .setNegativeButton("Fihrist test", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialogInterface, int i) {
-////                                    webViewEN.loadUrl("file:///android_asset/onuncusoz.html#sekizinci");
-//                                    webViewEN.evaluateJavascript("location.hash = '#sekizinci';", null);
-//
-//                                }
-//                            })
-//                            .setCancelable(true);
-////                            .create().show();
 
                 }
 
@@ -293,30 +157,6 @@ public class MainActivity extends AppCompatActivity {
             webViewEN.setOnScrollChangeListener(new View.OnScrollChangeListener() {
                 @Override
                 public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-//                    float positionTopView = webViewEN.getTop();
-//                    float contentHeight = webViewEN.getContentHeight();
-//                    float currentScrollPosition = webViewEN.getScrollY();
-//                    float percentWebview = (currentScrollPosition - positionTopView) / contentHeight;
-//
-//                    float webviewsize = webViewTR.getContentHeight() - webViewTR.getTop();
-//                    float positionInWV = webviewsize * percentWebview;
-//                    int positionY = Math.round(webViewTR.getTop() + positionInWV);
-//                    webViewTR.scrollTo(0, scrollY);
-
-//                    float dy = scrollY - oldScrollY;
-//
-//                    int currentPage = 0;
-//                    for(int i = 0; i < pageTopsWebViewEN.size(); i++) {
-//                        if(scrollY > pageTopsWebViewEN.get(i))
-//                            currentPage = i;
-//                        else
-//                            break;
-//                    }
-//
-//                    int currentPageSize = pageTopsWebViewEN.get(currentPage + 1) - pageTopsWebViewEN.get(currentPage);
-//                    int correspondingPageSize = pageTopsWebViewTR.get(currentPage + 1) - pageTopsWebViewTR.get(currentPage);
-//                    float scrollRatio = dy / currentPageSize;
-//                    webViewTR.scrollTo(scrollX - oldScrollX, webViewTR.getScrollY() + (int) (scrollRatio * correspondingPageSize));
                 }
             });
         }
@@ -369,5 +209,28 @@ public class MainActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    class MyJavaScriptInterface {
+
+        private Context ctx;
+
+        MyJavaScriptInterface(Context ctx) {
+            this.ctx = ctx;
+        }
+
+        @android.webkit.JavascriptInterface
+        public void scrollFinished(String activeParagraphId) {
+            runOnUiThread(() -> {
+                webViewTR.evaluateJavascript("$('html, body').animate({ scrollTop: $(\"p[name='" +
+                                activeParagraphId + "']\" ).offset().top - 15}, 1000);\n" +
+                                "$(\"p\").removeClass(\"highlighted\");\n" +
+                                "var currentPrg = $(\"p[name='" + activeParagraphId + "']\"); \n" +
+                                "currentPrg.addClass(\"highlighted\");" +
+                                "currentPrg.nextUntil(currentPrg.nextAll(\".Paragraf-1\").first(), \".Paragraf-2\").addClass(\"highlighted\");\n",
+                        null);
+            });
+        }
+
     }
 }

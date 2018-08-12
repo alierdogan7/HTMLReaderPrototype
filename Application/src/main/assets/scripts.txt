@@ -66,12 +66,28 @@ $(".Paragraf-1").each( function(index) {
 	
 	$(this).prepend("<h3>#" + index + "</h3>");
 	$(this).attr("name", "prg-" + index);
-	$('html, body').animate({ scrollTop: $(".Paragraf-1").eq(index).offset().top}, 1000);
+	// $('html, body').animate({ scrollTop: $(".Paragraf-1").eq(index).offset().top}, 1000);
 	//offsets.push(document.body.scrollTop + elm.getBoundingClientRect().top);
 } );
 
 
+// get first Paragraf-1 elt in current scroll
+function getElementByTopOffset(selector, offsetTop){
+    return $(selector).filter(function( index, elem) {
+       return $(elem).offset().top >= offsetTop;
+    }).first();
+}
 
+getElementByTopOffset(".Paragraf-1", $(window).scrollTop()).attr("name");
+
+//DETECT SCROLL STOPPING
+$(window).scroll(function() {
+    clearTimeout($.data(this, 'scrollTimer'));
+    $.data(this, 'scrollTimer', setTimeout(function() {
+        // do something
+        alert("Haven't scrolled in 250ms!");
+    }, 250));
+});
 
 //
 window.outerHeight // page height

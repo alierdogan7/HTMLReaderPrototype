@@ -66,15 +66,19 @@ body {
 }
 
 body#Onuncu_So-z_son {
-    padding: 25px;
+    padding: 15px;
 }
 
 hr.sayfaAralik  {
     border-top-style: solid;
-    border-top-width: 2px;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    border-top-width: 1px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     border-bottom-style: unset;
+}
+
+p.highlighted {
+	background-color: bisque;
 }
 
 @page {
