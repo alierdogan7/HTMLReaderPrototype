@@ -3,6 +3,51 @@
     <link href="css/idGeneratedStyles.css" rel="stylesheet" type="text/css">
     <script src="jquery-3.3.1.min.js"></script>
     <meta charset="utf-32">
+    <script type="text/javascript">
+
+                function getSelectionRanges() {
+                    var selectedWord = window.getSelection().toString();
+                    window.getSelection().modify("extend", "backward", "sentence");
+                    var prevPart = window.getSelection().toString();
+                    window.getSelection().modify("extend", "forward", "sentence");
+                    var nextPart = window.getSelection().toString();
+                    return [selectedWord, '|', nextPart, '|', prevPart]
+                }
+
+                $( document ).ready(function() {
+
+                    
+
+                    //GET FIRST PARAGRAF-1 ON CURRENT SCROLL
+                    function getElementByTopOffset(selector, offsetTop){
+                        return $(selector).filter(function( index, elem) {
+                           return $(elem).offset().top >= offsetTop;
+                        }).first();
+                    }
+
+                    //DETECT SCROLL STOPPING
+                    $(window).scroll(function() {
+
+                        clearTimeout($.data(this, 'scrollTimer'));
+                        $.data(this, 'scrollTimer', setTimeout(function() {
+
+                            $("p").removeClass("highlighted");
+                            
+                            console.log("Haven't scrolled in 250ms!");
+                            var currentPrg = getElementByTopOffset(".Paragraf-1", $(window).scrollTop());
+                            
+                            currentPrg.addClass("highlighted");
+                            currentPrg.nextUntil(currentPrg.nextAll(".Paragraf-1").first(), ".Paragraf-2").addClass("highlighted");
+
+                            window.androidInterface.scrollFinished(currentPrg.attr("name"), "SIDE_TR");
+
+                        }, 250));
+                    });
+
+
+                });
+
+        </script>
 
 
 </head>

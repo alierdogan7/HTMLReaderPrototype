@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    tools:context="com.example.android.pdfrendererbasic.MainActivity"
+    android:id="@+id/MotherLinearLayout"
+    >
+
+
+    <WebView
+        android:id="@+id/ingWV"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp"
+        android:layout_weight="1"
+        android:padding="10dp"
+        >
+
+    </WebView>
+
+    <TextView
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        android:background="@color/cardview_shadow_start_color"
+        android:foreground="@color/cardview_shadow_start_color"/>
+
+    <WebView
+        android:id="@+id/trVW"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp"
+        android:layout_weight="1"
+        android:padding="10dp"/>
+
+
+
+</LinearLayout>
+

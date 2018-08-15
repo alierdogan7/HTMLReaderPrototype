@@ -93,3 +93,47 @@ $(window).scroll(function() {
 window.outerHeight // page height
 document.body.scrollHeight // total height
 document.body.scrollTop // current scroll offset
+
+
+
+// FIND A SPECIFIC WORD AND ENCAPSULATE IT WITHIN A SPAN TAG AND ASSIGN IT AN ID
+var word = "god";
+
+function flatten(word) {
+	return word.trim().replace("-", ' ').toLowerCase();
+}
+var search = $( ".Paragraf-1, .Paragraf-2" ).filter( function ()
+{
+    return flatten($( this ).text()).indexOf( flatten(word) ) >= 0;
+}).each(function() {
+    var html = $(this).html();
+    $(this).html(html.replace(word, "<span class='lugatSpan'>" + word + "</span>")); 
+});
+
+
+
+// SET SELECTION RANGE
+function setSelectionRange(input, start, end) { 
+	if (input.setSelectionRange) {
+		input.focus();
+		input.setSelectionRange(start, end);
+	} else if (input.createTextRange) {
+		var range = input.createTextRange();
+		range.collapse(true);
+		range.moveEnd('character', end);
+		range.moveStart('character', start);
+		range.select();
+		return range;
+	}
+}
+
+
+//modify selection range
+function getSelectionRanges() {
+	var selectedWord = window.getSelection().toString();
+	window.getSelection().modify("extend", "backward", "sentence");
+	var prevPart = window.getSelection().toString();
+	window.getSelection().modify("extend", "forward", "sentence");
+	var nextPart = window.getSelection().toString();
+	return [selectedWord, nextPart, prevPart]
+}

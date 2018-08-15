@@ -5,7 +5,18 @@
 		    <meta charset="utf-8">			    
 	        <script type="text/javascript">
 
+				function getSelectionRanges() {
+					var selectedWord = window.getSelection().toString();
+					window.getSelection().modify("extend", "backward", "sentence");
+					var prevPart = window.getSelection().toString();
+					window.getSelection().modify("extend", "forward", "sentence");
+					var nextPart = window.getSelection().toString();
+					return [selectedWord, '|', nextPart, '|', prevPart]
+				}
+
 				$( document ).ready(function() {
+
+					
 
 				    //GET FIRST PARAGRAF-1 ON CURRENT SCROLL
 				    function getElementByTopOffset(selector, offsetTop){
@@ -28,7 +39,7 @@
 				            currentPrg.addClass("highlighted");
 				            currentPrg.nextUntil(currentPrg.nextAll(".Paragraf-1").first(), ".Paragraf-2").addClass("highlighted");
 
-				            window.androidInterface.scrollFinished(currentPrg.attr("name"));
+				            window.androidInterface.scrollFinished(currentPrg.attr("name"), "SIDE_OTHER");
 
 				        }, 250));
 				    });
