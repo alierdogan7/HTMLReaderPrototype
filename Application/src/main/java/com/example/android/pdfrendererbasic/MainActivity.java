@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
@@ -98,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
         webViewTR.getSettings().setDisplayZoomControls(true);
         webViewEN.getSettings().setDisplayZoomControls(false);
         webViewTR.getSettings().setDisplayZoomControls(false);
+        webViewEN.getSettings().setSupportZoom(false);
+        webViewTR.getSettings().setSupportZoom(false);
         webViewTR.loadUrl("file:///android_asset/tr_min.html");
 
         webViewEN.addJavascriptInterface(new MyJavaScriptInterface(this), "androidInterface");
@@ -113,6 +116,12 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
+            @Override
+            public void onScaleChanged(WebView view, float oldScale, float newScale) {
+                super.onScaleChanged(view, oldScale, newScale);
+                Log.d("SCALE", "old " + oldScale );
+                Log.d("SCALE", "new " + newScale );
+            }
         });
 
         webViewTR.setWebViewClient(new WebViewClient() {
@@ -184,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
             int newZoom = webViewEN.getSettings().getTextZoom() + 20;
             webViewEN.getSettings().setTextZoom(newZoom);
             webViewTR.getSettings().setTextZoom(newZoom);
-
         });
 
 
@@ -210,16 +218,16 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     }
                 });
-
-        if (webViewEN != null) {
-            webViewEN.evaluateJavascript("window.getSelection().toString()", (value) -> {
-                if (value != null && value.length() > 0) {
-                    // do something about user select
-                    Toast.makeText(getApplicationContext(), "SELECTED: " + value, Toast.LENGTH_SHORT).show();
-                    showLugatDefinition(value.replace("\"", ""));
-                }
-            });
-        }
+//
+//        if (webViewEN != null) {
+//            webViewEN.evaluateJavascript("window.getSelection().toString()", (value) -> {
+//                if (value != null && value.length() > 0) {
+//                    // do something about user select
+//                    Toast.makeText(getApplicationContext(), "SELECTED: " + value, Toast.LENGTH_SHORT).show();
+//                    showLugatDefinition(value.replace("\"", ""));
+//                }
+//            });
+//        }
 
 //        (new AlertDialog.Builder(this)).setTitle("DENEME").setMessage("DENEME").create().show();
 
@@ -362,6 +370,12 @@ public class MainActivity extends AppCompatActivity {
             else if (side.equals("SIDE_OTHER")) {
                 onAnimationOtherSide = false;
             }
+        }
+
+        @android.webkit.JavascriptInterface
+        public void receiveSelectedText(String word, String paragraph) {
+            showLugatDefinition(word.replace("\"", ""));
+            Toast.makeText(getApplicationContext(), "SELECTED: " + paragraph, Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -43,7 +43,12 @@
                         }, 250));
                     });
 
-
+                    $(".Paragraf-1, .Paragraf-2").on("contextmenu",function(){
+                        console.log("JSINT WORKY contextmenu" );
+                        console.log($(this).text());
+                        window.androidInterface.receiveSelectedText(window.getSelection().toString(), $(this).text());
+                    });
+             
                 });
 
         </script>
