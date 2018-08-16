@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -41,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Integer> pageTopsWebViewEN;
     boolean engLoaded = false;
     boolean trLoaded = false;
+    boolean onAnimationTRSide = false;
+    boolean onAnimationOtherSide = false;
+
+
     enum Side {Turkish, OtherLang, Neutral}
 
     @SuppressLint("NewApi")
@@ -78,10 +83,10 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
+    @SuppressLint("NewApi")
     public void prepareWebViews() {
-        webViewEN = (WebView)findViewById(R.id.ingWV);
-        webViewTR = (WebView)findViewById(R.id.trVW);
-
+        webViewEN = (WebView) findViewById(R.id.ingWV);
+        webViewTR = (WebView) findViewById(R.id.trVW);
 
 
         webViewEN.loadUrl("file:///android_asset/eng_min.html");
@@ -95,13 +100,13 @@ public class MainActivity extends AppCompatActivity {
         webViewTR.getSettings().setDisplayZoomControls(false);
         webViewTR.loadUrl("file:///android_asset/tr_min.html");
 
-        webViewEN.addJavascriptInterface(new MyJavaScriptInterface(this), "androidInterface" );
-        webViewTR.addJavascriptInterface(new MyJavaScriptInterface(this), "androidInterface" );
+        webViewEN.addJavascriptInterface(new MyJavaScriptInterface(this), "androidInterface");
+        webViewTR.addJavascriptInterface(new MyJavaScriptInterface(this), "androidInterface");
 
         webViewEN.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
-                if(engLoaded)
+                if (engLoaded)
                     return;
 
                 engLoaded = true;
@@ -114,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                if(trLoaded)
+                if (trLoaded)
                     return;
 
                 trLoaded = true;
@@ -126,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
 //        webViewEN.setOnScrollChangeListener(new View.OnScrollChangeListener() {
 //            @Override
 //            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+//
 //            }
 //        });
     }
@@ -138,45 +144,43 @@ public class MainActivity extends AppCompatActivity {
         RadioButton fihristRadio = (RadioButton) findViewById(R.id.fihristRadio);
         RadioGroup group = (RadioGroup) findViewById(R.id.radioGroup);
         group.setOnCheckedChangeListener((group1, checkedId) -> {
-            if(checkedId == R.id.fihristRadio)
+            if (checkedId == R.id.fihristRadio)
                 fihristMod = true;
             else
                 fihristMod = false;
         });
 
         pageSizesWebViewEN = new ArrayList<Integer>();
-        pageSizesWebViewTR  = new ArrayList<Integer>();
-        pageTopsWebViewEN  = new ArrayList<Integer>();
+        pageSizesWebViewTR = new ArrayList<Integer>();
+        pageTopsWebViewEN = new ArrayList<Integer>();
         pageTopsWebViewTR = new ArrayList<Integer>();
 
         currPage = 0;
         currFihrist = 0;
         nextButton.setOnClickListener((view) -> {
-            if(fihristMod) {
+            if (fihristMod) {
                 currFihrist++;
                 webViewEN.evaluateJavascript("location.hash = '#fihrist-" + new String(currFihrist + "") + "';", null);
                 webViewTR.evaluateJavascript("location.hash = '#fihrist-" + new String(currFihrist + "") + "';", null);
-            }
-            else {
+            } else {
                 currPage++;
                 webViewEN.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null);
                 webViewTR.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null);
             }
         });
         prevButton.setOnClickListener((view) -> {
-            if(fihristMod) {
+            if (fihristMod) {
                 currFihrist--;
                 webViewEN.evaluateJavascript("location.hash = '#fihrist-" + new String(currFihrist + "") + "';", null);
                 webViewTR.evaluateJavascript("location.hash = '#fihrist-" + new String(currFihrist + "") + "';", null);
-            }
-            else {
+            } else {
                 currPage--;
                 webViewEN.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null);
                 webViewTR.evaluateJavascript("location.hash = '#page-" + new String(currPage + "") + "';", null);
             }
         });
 
-        zoomPlus.setOnClickListener( (view) -> {
+        zoomPlus.setOnClickListener((view) -> {
             int newZoom = webViewEN.getSettings().getTextZoom() + 20;
             webViewEN.getSettings().setTextZoom(newZoom);
             webViewTR.getSettings().setTextZoom(newZoom);
@@ -184,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        zoomMinus.setOnClickListener( (view) -> {
+        zoomMinus.setOnClickListener((view) -> {
             int newZoom = webViewEN.getSettings().getTextZoom() - 20;
             webViewEN.getSettings().setTextZoom(newZoom);
             webViewTR.getSettings().setTextZoom(newZoom);
@@ -200,7 +204,6 @@ public class MainActivity extends AppCompatActivity {
                 .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
-
 
 
                         mode.finish();
@@ -231,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 List<Word> wordList = App.getDatabase().wordDao().getAllEnglishWordsPrefixWithoutDefinition("%" + word.toLowerCase().trim() + "%");
                 final StringBuilder s = new StringBuilder();
-                for(Word word : wordList)
+                for (Word word : wordList)
                     s.append(word.simpleWord + "\n\n");
 
                 runOnUiThread(() -> {
@@ -261,6 +264,7 @@ public class MainActivity extends AppCompatActivity {
         private String lastActiveParagraphId;
         private Side currentScroller;
 
+
         MyJavaScriptInterface(Context ctx) {
             this.ctx = ctx;
             this.lastActiveParagraphId = "";
@@ -269,61 +273,79 @@ public class MainActivity extends AppCompatActivity {
 
         @android.webkit.JavascriptInterface
         public void scrollFinished(String activeParagraphId, String side) {
-            if(currentScroller != Side.Neutral)
-                return;
+//            if(currentScroller != Side.Neutral)
+//                return;
 
-            if(side.equals("SIDE_OTHER")) {
-                currentScroller = Side.OtherLang;
+            if (side.equals("SIDE_OTHER")) {
+//                currentScroller = Side.OtherLang;
                 runOnUiThread(() -> {
-                        if (trLoaded ) {
+//                    if (trLoaded) {
+                    if (trLoaded && !onAnimationOtherSide) {
 //                        if (trLoaded && !lastActiveParagraphId.equals(activeParagraphId)) {
 //                        if (trLoaded && lastScroller != Side.Turkish
 //                                        && !lastActiveParagraphId.equals(activeParagraphId)) {
 //                            lastActiveParagraphId = activeParagraphId  + "";
-                            webViewTR.evaluateJavascript("$('html, body').animate({ scrollTop: $(\"p[name='" +
-                                            activeParagraphId + "']\" ).offset().top - 15}, 500);\n" +
-                                            "$(\"p\").removeClass(\"highlighted\");\n" +
-                                            "var currentPrg = $(\"p[name='" + activeParagraphId + "']\"); \n" +
-                                            "currentPrg.addClass(\"highlighted\");" +
-                                            "currentPrg.nextUntil(currentPrg.nextAll(\".Paragraf-1\").first(), \".Paragraf-2\").addClass(\"highlighted\");\n"
-                                    , (val) -> {
-                                        //callback function
-                                        Log.d("JSINTERFACE", "currScrol" + currentScroller);
-                                        Log.d("JSINTERFACE", "lastActivePrg" + lastActiveParagraphId);
-                                        Log.d("JSINTERFACE", "activePrg" + activeParagraphId);
-                                    });
-                            currentScroller = Side.Neutral;
+                        onAnimationTRSide = true;
+                        webViewTR.evaluateJavascript("$('html, body').animate({ scrollTop: $(\"p[name='" +
+//                                        activeParagraphId + "']\" ).offset().top - 15}, 500); " +
+                                        activeParagraphId + "']\" ).offset().top - 15}, 500, " + "function() { setTimeout(function() { window.androidInterface.animationFinished(\"SIDE_TR\"); },  500)});" +
+//                                        activeParagraphId + "']\" ).offset().top - 15}, 500, " + "function() { window.androidInterface.animationFinished(\"SIDE_TR\") });" +
+//                                        activeParagraphId + "']\" ).offset().top - 15}, 500, " + "function() { window.androidInterface.scrollFinished("
+//                                            + activeParagraphId + "\", \"SIDE_TR\"); }"  + ");\n" +
+//                                        + "getElementByTopOffset(\".Paragraf-1\", $(window).scrollTop()).attr(\"name\"), \"SIDE_TR\"); }" + ");\n" +
 
-                        }
+                                        "$(\"p\").removeClass(\"highlighted\");\n" +
+                                        "var currentPrg = $(\"p[name='" + activeParagraphId + "']\"); \n" +
+                                        "currentPrg.addClass(\"highlighted\");" +
+                                        "currentPrg.nextUntil(currentPrg.nextAll(\".Paragraf-1\").first(), \".Paragraf-2\").addClass(\"highlighted\");\n"
+                                , (val) -> {
+                                    //callback function
+                                    Log.d("JSINTERFACE", "currScrol" + currentScroller);
+                                    Log.d("JSINTERFACE", "lastActivePrg" + lastActiveParagraphId);
+                                    Log.d("JSINTERFACE", "activePrg" + activeParagraphId);
+                                });
+//                            currentScroller = Side.Neutral;
+
+                    } else {
+                        Log.d("JSINTERFACE", "CANNOT SEND ANIMATE REQ onAnimationTRSide = true;");
+                    }
 
 //                    }
                 });
-            }
-            else if (side.equals("SIDE_TR")) {
-                currentScroller = Side.Turkish;
+            } else if (side.equals("SIDE_TR")) {
+//                currentScroller = Side.Turkish;
                 runOnUiThread(() -> {
-                        if (engLoaded) {
+//                    if (engLoaded) {
+                    if (engLoaded && !onAnimationTRSide) {
 //                        if (engLoaded && !lastActiveParagraphId.equals(activeParagraphId)) {
 //                        if (engLoaded && lastScroller != Side.OtherLang
 //                                && !lastActiveParagraphId.equals(activeParagraphId)) {
 //                            lastActiveParagraphId = activeParagraphId + "";
-                            webViewEN.evaluateJavascript("$('html, body').animate({ scrollTop: $(\"p[name='" +
-                                            activeParagraphId + "']\" ).offset().top - 15}, 500);\n" +
-                                            "$(\"p\").removeClass(\"highlighted\");\n" +
-                                            "var currentPrg = $(\"p[name='" + activeParagraphId + "']\"); \n" +
-                                            "currentPrg.addClass(\"highlighted\");" +
-                                            "currentPrg.nextUntil(currentPrg.nextAll(\".Paragraf-1\").first(), \".Paragraf-2\").addClass(\"highlighted\");\n"
-                                    , (val) -> {
-                                        //callback function
-                                        Log.d("JSINTERFACE", "currScrol" + currentScroller);
-                                        Log.d("JSINTERFACE", "lastActivePrg" + lastActiveParagraphId);
-                                        Log.d("JSINTERFACE", "activePrg" + activeParagraphId);
+                        onAnimationOtherSide = true;
+                        webViewEN.evaluateJavascript("$('html, body').animate({ scrollTop: $(\"p[name='" +
+//                                        activeParagraphId + "']\" ).offset().top - 15}, 500);" +
+                                        activeParagraphId + "']\" ).offset().top - 15}, 500, " + "function() { setTimeout(function() { window.androidInterface.animationFinished(\"SIDE_OTHER\"); },  500)});" +
+//                                            + activeParagraphId + "\", \"SIDE_OTHER\"); }"  + ");\n" +
+//                                        + "getElementByTopOffset(\".Paragraf-1\", $(window).scrollTop()).attr(\"name\"), \"SIDE_OTHER\"); }" + ");\n" +
 
-                                    });
-                            currentScroller = Side.Neutral;
+                                        "$(\"p\").removeClass(\"highlighted\");\n" +
+                                        "var currentPrg = $(\"p[name='" + activeParagraphId + "']\"); \n" +
+                                        "currentPrg.addClass(\"highlighted\");" +
+                                        "currentPrg.nextUntil(currentPrg.nextAll(\".Paragraf-1\").first(), \".Paragraf-2\").addClass(\"highlighted\");\n"
+
+                                , (val) -> {
+                                    //callback function
+                                    Log.d("JSINTERFACE", "currScrol" + currentScroller);
+                                    Log.d("JSINTERFACE", "lastActivePrg" + lastActiveParagraphId);
+                                    Log.d("JSINTERFACE", "activePrg" + activeParagraphId);
+
+                                });
+//                            currentScroller = Side.Neutral;
 
 //                        }
 
+                    } else {
+                        Log.d("JSINTERFACE", "CANNOT SEND ANIMATE REQ onAnimationOtherSide = true;");
                     }
                 });
             } else {
@@ -331,5 +353,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        @android.webkit.JavascriptInterface
+        public void animationFinished(String side) {
+            Log.d("JSINTERFACE", "animationFinished(" + side + ") => onAnimation = false;");
+            if (side.equals("SIDE_TR")) {
+                onAnimationTRSide = false;
+            }
+            else if (side.equals("SIDE_OTHER")) {
+                onAnimationOtherSide = false;
+            }
+        }
     }
 }

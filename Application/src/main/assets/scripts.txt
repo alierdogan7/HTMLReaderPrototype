@@ -137,3 +137,16 @@ function getSelectionRanges() {
 	var nextPart = window.getSelection().toString();
 	return [selectedWord, nextPart, prevPart]
 }
+
+
+$('html, body').animate({ scrollTop: $(\"p[name='" +
+            activeParagraphId + "']\" ).offset().top - 15}, 500, function() { window.androidInterface.scrollFinished(currentPrg.attr("name"), "SIDE_TR"); } }
+
+);
+
+"$('html, body').animate({ scrollTop: $(\"p[name='" +
+            activeParagraphId + "']\" ).offset().top - 15}, 500);\n" +
+            "$(\"p\").removeClass(\"highlighted\");\n" +
+            "var currentPrg = $(\"p[name='" + activeParagraphId + "']\"); \n" +
+            "currentPrg.addClass(\"highlighted\");" +
+            "currentPrg.nextUntil(currentPrg.nextAll(\".Paragraf-1\").first(), \".Paragraf-2\").addClass(\"highlighted\");\n"
