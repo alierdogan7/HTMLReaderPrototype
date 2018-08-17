@@ -38,7 +38,8 @@
                             currentPrg.addClass("highlighted");
                             currentPrg.nextUntil(currentPrg.nextAll(".Paragraf-1").first(), ".Paragraf-2").addClass("highlighted");
 
-                            window.androidInterface.scrollFinished(currentPrg.attr("name"), "SIDE_TR");
+                            var activeParagraphDistanceToWindow = currentPrg.offset().top - $(window).scrollTop();
+                            window.androidInterface.scrollFinished(currentPrg.attr("name"), "SIDE_TR", activeParagraphDistanceToWindow);
 
                         }, 250));
                     });
@@ -46,7 +47,7 @@
                     $(".Paragraf-1, .Paragraf-2").on("contextmenu",function(){
                         console.log("JSINT WORKY contextmenu" );
                         console.log($(this).text());
-                        window.androidInterface.receiveSelectedText(window.getSelection().toString(), $(this).text());
+                        window.androidInterface.receiveSelectedText(window.getSelection().toString(), $(this).text(), "TR");
                     });
              
                 });

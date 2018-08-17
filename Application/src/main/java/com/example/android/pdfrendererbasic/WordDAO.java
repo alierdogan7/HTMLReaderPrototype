@@ -21,6 +21,12 @@ public interface WordDAO {
     @Query("SELECT id, simpleWord, fullWord, language FROM word_table WHERE simpleWord LIKE :prefix AND language = 'ENG'  ORDER BY simpleWord LIMIT 300")
     List<Word> getAllEnglishWordsPrefixWithoutDefinition(String prefix);
 
+    @Query("SELECT id, simpleWord, fullWord, language, definition FROM word_table WHERE simpleWord LIKE :prefix AND language = 'ENG'  ORDER BY length(simpleWord) DESC LIMIT 50")
+    List<Word> getAllPrefixCandidateLugatMatchesEnglishOrderedByLength(String prefix);
+
+    @Query("SELECT id, simpleWord, fullWord, language, definition FROM word_table WHERE simpleWord LIKE :prefix AND language = 'TR'  ORDER BY length(simpleWord) DESC LIMIT 50")
+    List<Word> getAllPrefixCandidateLugatMatchesTurkishOrderedByLength(String prefix);
+
     @Query("SELECT id, simpleWord, fullWord, definition, language FROM word_table WHERE language = 'ENG' ORDER BY simpleWord")
     List<Word> getAllEnglishWords();
 

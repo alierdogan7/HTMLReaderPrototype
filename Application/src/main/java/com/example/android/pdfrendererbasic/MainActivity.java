@@ -9,10 +9,13 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -236,17 +239,36 @@ public class MainActivity extends AppCompatActivity {
         super.onActionModeStarted(mode);
     }
 
-    public void showLugatDefinition(String word) {
+    public void showLugatDefinition(String word, String paragraph, String language) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                List<Word> wordList = App.getDatabase().wordDao().getAllEnglishWordsPrefixWithoutDefinition("%" + word.toLowerCase().trim() + "%");
+                List<Word> wordList = null;
+
+                if(language.equals("TR"))
+                    wordList = App.getDatabase().wordDao().getAllPrefixCandidateLugatMatchesTurkishOrderedByLength("%" + word.toLowerCase().trim() + "%");
+                else if(language.equals("ENG"))
+                    wordList = App.getDatabase().wordDao().getAllPrefixCandidateLugatMatchesEnglishOrderedByLength("%" + word.toLowerCase().trim() + "%");
+
                 final StringBuilder s = new StringBuilder();
-                for (Word word : wordList)
-                    s.append(word.simpleWord + "\n\n");
+                for (Word word : wordList) {
+//                    s.append(word.simpleWord + "\n\n");
+                    if(paragraph.toLowerCase().contains(word.simpleWord)) {
+                        s.append(word.simpleWord + ": ");
+                        s.append(word.definition);
+                        break;
+                    }
+                }
 
                 runOnUiThread(() -> {
-                    new AlertDialog.Builder(mContext).setMessage(s).create().show();
+                    AlertDialog dialog = new AlertDialog.Builder(mContext).setMessage(s).create();
+                    dialog.getWindow().setDimAmount(0);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    WindowManager.LayoutParams wmlp = dialog.getWindow().getAttributes();
+                    wmlp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+//                    wmlp.x = 100;   //x position
+                    wmlp.y = 20;   //y position
+                    dialog.show();
                 });
             }
         }).start();
@@ -280,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @android.webkit.JavascriptInterface
-        public void scrollFinished(String activeParagraphId, String side) {
+        public void scrollFinished(String activeParagraphId, String side, String activeParagraphDistanceToWindow) {
 //            if(currentScroller != Side.Neutral)
 //                return;
 
@@ -296,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
                         onAnimationTRSide = true;
                         webViewTR.evaluateJavascript("$('html, body').animate({ scrollTop: $(\"p[name='" +
 //                                        activeParagraphId + "']\" ).offset().top - 15}, 500); " +
-                                        activeParagraphId + "']\" ).offset().top - 15}, 500, " + "function() { setTimeout(function() { window.androidInterface.animationFinished(\"SIDE_TR\"); },  500)});" +
+                                        activeParagraphId + "']\" ).offset().top - " + activeParagraphDistanceToWindow + "}, 500, " + "function() { setTimeout(function() { window.androidInterface.animationFinished(\"SIDE_TR\"); },  500)});" +
 //                                        activeParagraphId + "']\" ).offset().top - 15}, 500, " + "function() { window.androidInterface.animationFinished(\"SIDE_TR\") });" +
 //                                        activeParagraphId + "']\" ).offset().top - 15}, 500, " + "function() { window.androidInterface.scrollFinished("
 //                                            + activeParagraphId + "\", \"SIDE_TR\"); }"  + ");\n" +
@@ -332,7 +354,7 @@ public class MainActivity extends AppCompatActivity {
                         onAnimationOtherSide = true;
                         webViewEN.evaluateJavascript("$('html, body').animate({ scrollTop: $(\"p[name='" +
 //                                        activeParagraphId + "']\" ).offset().top - 15}, 500);" +
-                                        activeParagraphId + "']\" ).offset().top - 15}, 500, " + "function() { setTimeout(function() { window.androidInterface.animationFinished(\"SIDE_OTHER\"); },  500)});" +
+                                        activeParagraphId + "']\" ).offset().top - " + activeParagraphDistanceToWindow + "}, 500, " + "function() { setTimeout(function() { window.androidInterface.animationFinished(\"SIDE_OTHER\"); },  500)});" +
 //                                            + activeParagraphId + "\", \"SIDE_OTHER\"); }"  + ");\n" +
 //                                        + "getElementByTopOffset(\".Paragraf-1\", $(window).scrollTop()).attr(\"name\"), \"SIDE_OTHER\"); }" + ");\n" +
 
@@ -373,8 +395,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @android.webkit.JavascriptInterface
-        public void receiveSelectedText(String word, String paragraph) {
-            showLugatDefinition(word.replace("\"", ""));
+        public void receiveSelectedText(String word, String paragraph, String language) {
+            showLugatDefinition(word.replace("\"", ""), paragraph, language);
             Toast.makeText(getApplicationContext(), "SELECTED: " + paragraph, Toast.LENGTH_SHORT).show();
         }
     }

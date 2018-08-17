@@ -139,10 +139,7 @@ function getSelectionRanges() {
 }
 
 
-$('html, body').animate({ scrollTop: $(\"p[name='" +
-            activeParagraphId + "']\" ).offset().top - 15}, 500, function() { window.androidInterface.scrollFinished(currentPrg.attr("name"), "SIDE_TR"); } }
-
-);
+$('html, body').animate({ scrollTop: $("p[name='prg-12']" ).offset().top - 15}, 500, function() { console.log("SIDE_TR"); });
 
 "$('html, body').animate({ scrollTop: $(\"p[name='" +
             activeParagraphId + "']\" ).offset().top - 15}, 500);\n" +
