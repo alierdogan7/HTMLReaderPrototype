@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     boolean trLoaded = false;
     boolean onAnimationTRSide = false;
     boolean onAnimationOtherSide = false;
-
+    ScaleGestureDetector sgd;
 
     enum Side {Turkish, OtherLang, Neutral}
 
@@ -91,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
     public void prepareWebViews() {
         webViewEN = (WebView) findViewById(R.id.ingWV);
         webViewTR = (WebView) findViewById(R.id.trVW);
-
 
         webViewEN.loadUrl("file:///android_asset/eng_min.html");
         webViewEN.getSettings().setBuiltInZoomControls(true);
@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
             int newZoom = webViewEN.getSettings().getTextZoom() + 20;
             webViewEN.getSettings().setTextZoom(newZoom);
             webViewTR.getSettings().setTextZoom(newZoom);
-        });
+            });
 
 
         zoomMinus.setOnClickListener((view) -> {
@@ -239,29 +239,68 @@ public class MainActivity extends AppCompatActivity {
         super.onActionModeStarted(mode);
     }
 
+    public String normalizeWord(String word) {
+        return word.replace("î", "i").replace("Î", "i").
+                replace("Û", "u").replace("û", "u")
+                .replace("â", "a").replace("Â", "a")
+                .replace("'", "").replace("’", "");
+    }
+
     public void showLugatDefinition(String word, String paragraph, String language) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 List<Word> wordList = null;
+                final StringBuilder dialogMessage = new StringBuilder();
+                String normalizedWord = null;
+                String normalizedParagraph = normalizeWord(paragraph).toLowerCase();
 
-                if(language.equals("TR"))
-                    wordList = App.getDatabase().wordDao().getAllPrefixCandidateLugatMatchesTurkishOrderedByLength("%" + word.toLowerCase().trim() + "%");
-                else if(language.equals("ENG"))
-                    wordList = App.getDatabase().wordDao().getAllPrefixCandidateLugatMatchesEnglishOrderedByLength("%" + word.toLowerCase().trim() + "%");
+                if(!language.equals("TR") && !language.equals("ENG"))
+                    throw new IllegalArgumentException("Language should be TR or ENG");
 
-                final StringBuilder s = new StringBuilder();
-                for (Word word : wordList) {
-//                    s.append(word.simpleWord + "\n\n");
-                    if(paragraph.toLowerCase().contains(word.simpleWord)) {
-                        s.append(word.simpleWord + ": ");
-                        s.append(word.definition);
-                        break;
-                    }
+                normalizedWord = normalizeWord(word.trim()).toLowerCase();
+
+                String[] prefices = new String[30];
+
+                // i.e. "risalelerde" generates prefices like "risaleler", "risalel", "risal", "ris"
+                for(int i = normalizedWord.length(), j = 0; i > 3; i = i - 2) {
+                    prefices[j] = normalizedWord.substring(0, i);
+                    j++;
                 }
 
+                List<Word> candidateWords = null;
+                boolean bestSuitableWordFound = false;
+                //longest prefix is at the first position in the array
+                for(String prefix : prefices) {
+                    candidateWords = App.getDatabase().wordDao()
+                            .getAllPrefixCandidateLugatMatchesOrderedByLength("%" + prefix + "%", language);
+
+
+                    if(candidateWords.size() > 0)
+                        // start from the longest matched word, i.e. "risale" (because array received from db is sorted)
+                        for(Word word : candidateWords) {
+                            if (normalizedParagraph.contains(word.simpleWord)) { // means that the best suiting word found
+                                dialogMessage.append(word.fullWord + ": ");
+
+                                if(word.definition.length() > 100)
+                                    dialogMessage.append(word.definition.substring(0,100) + " ...");
+                                else
+                                    dialogMessage.append(word.definition);
+
+                                bestSuitableWordFound = true;
+                                break;
+                            }
+                        }
+
+                    if(bestSuitableWordFound)
+                        break; // no need to search with the rest of the prefices
+                }
+
+
+
+
                 runOnUiThread(() -> {
-                    AlertDialog dialog = new AlertDialog.Builder(mContext).setMessage(s).create();
+                    AlertDialog dialog = new AlertDialog.Builder(mContext).setMessage(dialogMessage).create();
                     dialog.getWindow().setDimAmount(0);
                     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                     WindowManager.LayoutParams wmlp = dialog.getWindow().getAttributes();
@@ -299,6 +338,16 @@ public class MainActivity extends AppCompatActivity {
             this.ctx = ctx;
             this.lastActiveParagraphId = "";
             this.currentScroller = Side.Neutral;
+        }
+
+        @android.webkit.JavascriptInterface
+        public void receiveFihrist(String[] fihristIds, String[] fihristNames) {
+            if (fihristIds.length != fihristNames.length)
+                return;
+
+            for(int i = 0; i < fihristIds.length; i++) {
+                Log.d("JSINT", fihristIds[i] + " = " + fihristNames[i]);
+            }
         }
 
         @android.webkit.JavascriptInterface

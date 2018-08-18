@@ -51,6 +51,18 @@
                         window.androidInterface.receiveSelectedText(window.getSelection().toString(), $(this).text(), "ENG");
                     });
 
+                    // COLLECT ALL FIHRIST NAMES
+                	var fihristIds = [];
+                    var fihristNames = [];
+                    $("[name^='fihrist-']").filter(function() {return $(this).text().length > 0})
+                        .each(function() { 
+                            // console.log($(this).text()) 
+                            fihristIds.push($(this).attr("name"));
+                            fihristNames.push($(this).text());
+                        } );
+                    window.androidInterface.receiveFihrist(fihristIds, fihristNames);
+                    
+
 
 				});
 

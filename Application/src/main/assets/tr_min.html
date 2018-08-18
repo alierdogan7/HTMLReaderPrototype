@@ -2,7 +2,7 @@
     <title>Onuncu_Söz_son</title>
     <link href="css/idGeneratedStyles.css" rel="stylesheet" type="text/css">
     <script src="jquery-3.3.1.min.js"></script>
-    <meta charset="utf-32">
+    <meta charset="utf-8">
     <script type="text/javascript">
 
                 function getSelectionRanges() {
@@ -44,12 +44,24 @@
                         }, 250));
                     });
 
+                    // LUGAT POPUP WHEN LONG PRESSED
                     $(".Paragraf-1, .Paragraf-2").on("contextmenu",function(){
                         console.log("JSINT WORKY contextmenu" );
                         console.log($(this).text());
                         window.androidInterface.receiveSelectedText(window.getSelection().toString(), $(this).text(), "TR");
                     });
-             
+
+                    // COLLECT ALL FIHRIST NAMES
+                    var fihristIds = [];
+                    var fihristNames = [];
+                    $("[name^='fihrist-']").filter(function() {return $(this).text().length > 0})
+                        .each(function() { 
+                            // console.log($(this).text()) 
+                            fihristIds.push($(this).attr("name"));
+                            fihristNames.push($(this).text());
+                        } );
+                    window.androidInterface.receiveFihrist(fihristIds, fihristNames);
+                    
                 });
 
         </script>

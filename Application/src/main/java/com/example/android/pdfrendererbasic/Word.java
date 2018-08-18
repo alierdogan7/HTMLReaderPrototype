@@ -29,4 +29,9 @@ public class Word {
         else
             throw new IllegalArgumentException("language should be either TR or ENG");
     }
+
+    @Override
+    public String toString() {
+        return this.simpleWord;
+    }
 }
