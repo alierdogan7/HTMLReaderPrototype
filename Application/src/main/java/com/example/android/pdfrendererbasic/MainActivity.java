@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
 
     enum Side {Turkish, OtherLang, Neutral}
 
-    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,12 +87,12 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState, outPersistentState);
     }
 
-    @SuppressLint("NewApi")
     public void prepareWebViews() {
         webViewEN = (WebView) findViewById(R.id.ingWV);
         webViewTR = (WebView) findViewById(R.id.trVW);
 
-        webViewEN.loadUrl("file:///android_asset/eng_min.html");
+//        webViewEN.loadUrl("file:///android_asset/eng_min.html");
+        webViewEN.loadUrl("file:///android_asset/hasr-ENG-tashihli.html");
         webViewEN.getSettings().setBuiltInZoomControls(true);
         webViewEN.getSettings().setDisplayZoomControls(true);
         webViewEN.getSettings().setJavaScriptEnabled(true);
@@ -104,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
         webViewTR.getSettings().setDisplayZoomControls(false);
         webViewEN.getSettings().setSupportZoom(false);
         webViewTR.getSettings().setSupportZoom(false);
-        webViewTR.loadUrl("file:///android_asset/tr_min.html");
+//        webViewTR.loadUrl("file:///android_asset/tr_min.html");
+        webViewTR.loadUrl("file:///android_asset/hasr-TR-tashihli.html");
 
         webViewEN.addJavascriptInterface(new MyJavaScriptInterface(this), "androidInterface");
         webViewTR.addJavascriptInterface(new MyJavaScriptInterface(this), "androidInterface");

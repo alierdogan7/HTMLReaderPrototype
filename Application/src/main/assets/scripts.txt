@@ -10,7 +10,8 @@ for( x in document.getElementsByClassName('Alt-Başlık')) {
 for( x in document.getElementsByClassName('sayfaAralik')) {
 	//var inText = document.getElementsByClassName('sayfaAralik')[x].setAttribute("name", "page-" + x);
 	//var pageNumHeader = document.createTextNode("#" + x);
-	document.getElementsByClassName('sayfaAralik')[x].insertAdjacentHTML("afterend", "<a class='pageNumber' name='page-" + x + "'>#" + x + "</a>");
+	var y = parseInt(x) + 1;
+	document.getElementsByClassName('sayfaAralik')[x].insertAdjacentHTML("afterend", "<a class='pageNumber' name='page-" + y + "'>#" + y + "</a>");
 }
 
 

@@ -21,14 +21,28 @@
 	font-family:Souvenir;
 	font-style:italic;
 	font-weight:normal;
-	src : url("file:///android_asset/font/Barla 012 Souvenir Demi BT.ttf") format('truetype');
+	src : url("file:///android_asset/font/souvenir light italic bt.ttf") format('truetype');
+}
+
+@font-face {
+	font-family:Souvenir;
+	font-style:italic;
+	font-weight:bold;
+	src : url("file:///android_asset/font/souvenir demi italic bt.ttf") format('truetype');
 }
 
 @font-face {
 	font-family:Souvenir;
 	font-style:oblique;
 	font-weight:normal;
-	src : url("file:///android_asset/font/Barla 012 Souvenir Demi BT.ttf") format('truetype');
+	src : url("file:///android_asset/font/souvenir light bt.ttf") format('truetype');
+}
+
+@font-face {
+	font-family:Souvenir;
+	font-style:normal;
+	font-weight:normal;
+	src : url("file:///android_asset/font/souvenir light bt.ttf") format('truetype');
 }
 /* @font-face {
 	font-family:Souvenir;
@@ -63,6 +77,8 @@ body, div, dl, dt, dd, h1, h2, h3, h4, h5, h6, p, pre, code, blockquote {
 }
 body {
 	-epub-hyphens:auto;
+	background-image: url("file:///android_asset/css/BG.png");
+	background-repeat: repeat;
 }
 
 body#Onuncu_So-z_son {
