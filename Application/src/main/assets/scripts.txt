@@ -139,6 +139,14 @@ function getSelectionRanges() {
 	return [selectedWord, nextPart, prevPart]
 }
 
+function getSelectionRanges() {
+                    var selectedWord = window.getSelection().toString();
+                    window.getSelection().modify("extend", "backward", "sentence");
+                    var prevPart = window.getSelection().toString();
+                    window.getSelection().modify("extend", "forward", "sentence");
+                    var nextPart = window.getSelection().toString();
+                    return [selectedWord, '|', nextPart, '|', prevPart]
+                }
 
 $('html, body').animate({ scrollTop: $("p[name='prg-12']" ).offset().top - 15}, 500, function() { console.log("SIDE_TR"); });
 

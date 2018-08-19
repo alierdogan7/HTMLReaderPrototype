@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
@@ -91,20 +92,31 @@ public class MainActivity extends AppCompatActivity {
         webViewEN = (WebView) findViewById(R.id.ingWV);
         webViewTR = (WebView) findViewById(R.id.trVW);
 
-//        webViewEN.loadUrl("file:///android_asset/eng_min.html");
-        webViewEN.loadUrl("file:///android_asset/hasr-ENG-tashihli.html");
+        if (Build.VERSION.SDK_INT >= 19) {
+            webViewEN.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            webViewTR.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        }
+        else {
+            webViewEN.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            webViewTR.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        }
+
+        webViewEN.loadUrl("file:///android_asset/hasir/eng_root.html");
+//        webViewEN.loadUrl("file:///android_asset/hasir/hasr-ENG-tashihli.html");
         webViewEN.getSettings().setBuiltInZoomControls(true);
         webViewEN.getSettings().setDisplayZoomControls(true);
         webViewEN.getSettings().setJavaScriptEnabled(true);
         webViewTR.getSettings().setJavaScriptEnabled(true);
+        webViewEN.getSettings().setAllowFileAccessFromFileURLs(true);
+        webViewTR.getSettings().setAllowFileAccessFromFileURLs(true);
         webViewTR.getSettings().setBuiltInZoomControls(true);
         webViewTR.getSettings().setDisplayZoomControls(true);
         webViewEN.getSettings().setDisplayZoomControls(false);
         webViewTR.getSettings().setDisplayZoomControls(false);
         webViewEN.getSettings().setSupportZoom(false);
         webViewTR.getSettings().setSupportZoom(false);
-//        webViewTR.loadUrl("file:///android_asset/tr_min.html");
-        webViewTR.loadUrl("file:///android_asset/hasr-TR-tashihli.html");
+        webViewTR.loadUrl("file:///android_asset/hasir/tr_root.html");
+//        webViewTR.loadUrl("file:///android_asset/hasir/hasr-TR-tashihli.html");
 
         webViewEN.addJavascriptInterface(new MyJavaScriptInterface(this), "androidInterface");
         webViewTR.addJavascriptInterface(new MyJavaScriptInterface(this), "androidInterface");
@@ -341,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @android.webkit.JavascriptInterface
-        public void receiveFihrist(String[] fihristIds, String[] fihristNames) {
+        public void receiveFihrist(String[] fihristIds, String[] fihristNames, String lang) {
             if (fihristIds.length != fihristNames.length)
                 return;
 
@@ -440,6 +452,42 @@ public class MainActivity extends AppCompatActivity {
             }
             else if (side.equals("SIDE_OTHER")) {
                 onAnimationOtherSide = false;
+            }
+        }
+
+        @android.webkit.JavascriptInterface
+        public void sectionChangeFinished(String sectionNo, String side, String flag) {
+            if (side.equals("SIDE_TR") && !onAnimationTRSide) {
+                onAnimationOtherSide = true;
+                runOnUiThread(() -> {
+                    String command = "";
+                    if(flag.equals("FLAG_JUMP"))
+                        command = "changeToSection(" + sectionNo + ",";
+                    else if(flag.equals("FLAG_PREV"))
+                        command = "changeToPrevSection(";
+                    else if(flag.equals("FLAG_NEXT"))
+                        command = "changeToNextSection(";
+
+                    webViewEN.evaluateJavascript( command +
+                                "function() { setTimeout(function() { window.androidInterface.animationFinished(\"SIDE_OTHER\"); },  500)});", null);
+
+                });
+            }
+            else if (side.equals("SIDE_OTHER") && !onAnimationOtherSide) {
+                onAnimationTRSide = true;
+                runOnUiThread(() -> {
+                    String command = "";
+                    if(flag.equals("FLAG_JUMP"))
+                        command = "changeToSection(" + sectionNo + ",";
+                    else if(flag.equals("FLAG_PREV"))
+                        command = "changeToPrevSection(";
+                    else if(flag.equals("FLAG_NEXT"))
+                        command = "changeToNextSection(";
+
+                    webViewTR.evaluateJavascript( command +
+                            "function() { setTimeout(function() { window.androidInterface.animationFinished(\"SIDE_TR\"); },  500)});", null);
+
+                });
             }
         }
 
