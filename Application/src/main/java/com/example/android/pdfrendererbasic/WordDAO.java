@@ -21,8 +21,37 @@ public interface WordDAO {
     @Query("SELECT id, simpleWord, fullWord, language FROM word_table WHERE simpleWord LIKE :prefix AND language = 'ENG'  ORDER BY simpleWord LIMIT 300")
     List<Word> getAllEnglishWordsPrefixWithoutDefinition(String prefix);
 
-    @Query("SELECT id, simpleWord, fullWord, language, definition FROM word_table WHERE simpleWord LIKE :prefix AND language = :lang  ORDER BY length(simpleWord) DESC LIMIT 50")
-    List<Word> getAllPrefixCandidateLugatMatchesOrderedByLength(String prefix, String lang);
+    @Query("SELECT id, simpleWord FROM word_table " +
+            "WHERE simpleWord LIKE :prefix AND language = :lang  ORDER BY length(simpleWord) DESC LIMIT 50")
+    List<Word> getAllPrefixCandidateLugatMatchesOrderedByLength1Prefix(String lang, String prefix);
+
+    @Query("SELECT id, simpleWord FROM word_table " +
+            "WHERE simpleWord LIKE :prefix1 OR simpleWord LIKE :prefix2 " +
+            "AND language = :lang  ORDER BY length(simpleWord) DESC LIMIT 100")
+    List<Word> getAllPrefixCandidateLugatMatchesOrderedByLength2Prefix(String lang, String prefix1, String prefix2);
+
+    @Query("SELECT id, simpleWord FROM word_table " +
+            "WHERE simpleWord LIKE :prefix1 OR simpleWord LIKE :prefix2 OR simpleWord LIKE :prefix3 " +
+            "AND language = :lang  ORDER BY length(simpleWord) DESC LIMIT 100")
+    List<Word> getAllPrefixCandidateLugatMatchesOrderedByLength3Prefix(String lang, String prefix1, String prefix2, String prefix3);
+
+    @Query("SELECT id, simpleWord FROM word_table " +
+            "WHERE simpleWord LIKE :prefix1 OR simpleWord LIKE :prefix2 OR simpleWord LIKE :prefix3 " +
+            "OR simpleWord LIKE :prefix4 " +
+            "AND language = :lang  ORDER BY length(simpleWord) DESC LIMIT 100")
+    List<Word> getAllPrefixCandidateLugatMatchesOrderedByLength4Prefix(String lang, String prefix1, String prefix2, String prefix3, String prefix4);
+
+    @Query("SELECT id, simpleWord FROM word_table " +
+            "WHERE simpleWord LIKE :prefix1 OR simpleWord LIKE :prefix2 OR simpleWord LIKE :prefix3 " +
+            "OR simpleWord LIKE :prefix4 OR simpleWord LIKE :prefix5 " +
+            "AND language = :lang  ORDER BY length(simpleWord) DESC LIMIT 100")
+    List<Word> getAllPrefixCandidateLugatMatchesOrderedByLength5Prefix(String lang, String prefix1, String prefix2, String prefix3, String prefix4, String prefix5);
+
+    @Query("SELECT id, simpleWord FROM word_table " +
+            "WHERE simpleWord LIKE :prefix1 OR simpleWord LIKE :prefix2 OR simpleWord LIKE :prefix3 " +
+            "OR simpleWord LIKE :prefix4 OR simpleWord LIKE :prefix5 OR simpleWord LIKE :prefix6 " +
+            "AND language = :lang  ORDER BY length(simpleWord) DESC LIMIT 100")
+    List<Word> getAllPrefixCandidateLugatMatchesOrderedByLength6Prefix(String lang, String prefix1, String prefix2, String prefix3, String prefix4, String prefix5, String prefix6);
 
     @Query("SELECT id, simpleWord, fullWord, language, definition FROM word_table WHERE simpleWord IN(:prefices) AND language = :lang  ORDER BY length(simpleWord) DESC LIMIT 50")
     List<Word> getAllMultiplePrefixCandidateLugatMatchesOrderedByLength(String[] prefices, String lang);

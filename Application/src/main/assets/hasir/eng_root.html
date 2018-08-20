@@ -5,156 +5,173 @@
     <meta charset="utf-8">
     <script type="text/javascript">
 
-                var sectionNo = 0;
-                var lastSection = 2;
-                var sectionOffset = 10;
-                var sectionLang = "ENG";
-                var justChangedSection = false; //prevent isAtPageTop get fired when new section loaded and scroll is at the top
+            var sectionNo = 0;
+            var lastSection = 2;
+            var sectionOffset = 10;
+            var sectionLang = "ENG";
+            var justChangedSection = false; //prevent isAtPageTop get fired when new section loaded and scroll is at the top
+            var firstLoading = true;
 
-                var rootUrl = "file:///android_asset/hasir/";
-                // var rootUrl = "http://localhost:9000/hasir/";
+            var rootUrl = "file:///android_asset/hasir/";
+            // var rootUrl = "http://localhost:9000/hasir/";
 
-                function changeToSectionOfPage(page, flag, callback = null) {
-                    var currSectionStart = parseInt(page / sectionOffset) * sectionOffset + 1;
+            // LUGAT POPUP WHEN LONG PRESSED
+            function onContextMenuListener() {
+                console.log("JSINT WORKY contextmenu" );
+                console.log($(this).text());
+                window.androidInterface.receiveSelectedText(window.getSelection().toString(), $(this).text(), "ENG");
+            }
 
-                    //load the first section
-                    console.log("loading " + currSectionStart);
-                    
-                    $("#container").html("");
-                    $("#container").load(rootUrl + "hasr-" + sectionLang + "-" + currSectionStart + "-" + (currSectionStart+sectionOffset-1) + ".html", function() {
+            function changeToSectionOfPage(page, flag, callback = null, fihristName = "") {
+                
+                var currSectionStart = parseInt((page-1) / sectionOffset) * sectionOffset + 1;
+
+                //load the first section
+                console.log("loading " + currSectionStart);
+                
+                $("#container").html("");
+                $("#container").load(rootUrl + "hasr-" + sectionLang + "-" + currSectionStart + "-" + (currSectionStart+sectionOffset-1) + ".html", function() {
+                        if(callback)
+                            callback();
+
+                        var nextBt = $("<button>==></button>").attr("class", "navButton").click(function() {changeToNextSection() });
+                        var prevBt = $("<button><==</button>").attr("class", "navButton").click(function() {changeToPrevSection() });
+
+                        if(sectionNo < lastSection)
+                            $("#container").append(nextBt);
+                        if(sectionNo >= 1)
+                            $("#container").prepend(prevBt);
+
+                        // for lugat popup
+                        $(".Paragraf-1, .Paragraf-2").on("contextmenu", onContextMenuListener);
+
+                        if(fihristName.length > 0)
+                            location.hash = "#" + fihristName;
+
+                       window.androidInterface.sectionChangeFinished(sectionNo, "SIDE_OTHER", flag);    
+                });
+            }
+
+            function changeToSection(sectionToChanged, fihristName = "", callback = null) {
+                if(sectionNo == parseInt(sectionToChanged)) {
+                    console.log("the page is already in current section, NOT RELOADING");
+                    if(fihristName.length > 0)
+                        location.hash = "#" + fihristName;
+                    return;
+                } else {
+                    sectionNo = parseInt(sectionToChanged);
+                }
+
+                if (sectionNo >= 0) {
+                    var page = (sectionNo) * sectionOffset + 1;
+                    changeToSectionOfPage(page, "FLAG_JUMP", callback, fihristName); 
+                }
+            }
+
+            function changeToNextSection(callback = null) {
+                sectionNo++;
+                changeToSectionOfPage(sectionNo * sectionOffset + 1, "FLAG_NEXT", function() {
+                            //when prev page loaded scroll to bottom
+                            window.scrollTo(0,0);
                             if(callback)
                                 callback();
+                        });
+                justChangedSection = true;
+            }
 
-                            var nextBt = $("<button>==></button>").attr("class", "navButton").click(function() {changeToNextSection() });
-                            var prevBt = $("<button><==</button>").attr("class", "navButton").click(function() {changeToPrevSection() });
-
-                            if(sectionNo < lastSection)
-                                $("#container").append(nextBt);
-                            if(sectionNo >= 1)
-                                $("#container").prepend(prevBt);
-                            
-
-                           window.androidInterface.sectionChangeFinished(sectionNo, "SIDE_OTHER", flag);    
-                    });
-                }
-
-                function changeToSection(sectionToChanged, callback = null) {
-                    sectionNo = parseInt(sectionToChanged);
-                    if (sectionNo >= 0) {
-                        var page = (sectionNo) * sectionOffset + 1;
-                        changeToSectionOfPage(page, "FLAG_JUMP", function() {
-                                //when prev page loaded scroll to bottom
-                                window.scrollTo(0,0);
-                                if(callback)
-                                    callback();
-                            }); 
-                    }
-                }
-
-                function changeToNextSection(callback = null) {
-                    sectionNo++;
-                    changeToSectionOfPage(sectionNo * sectionOffset + 1, "FLAG_NEXT", function() {
-                                //when prev page loaded scroll to bottom
-                                window.scrollTo(0,0);
-                                if(callback)
-                                    callback();
-                            });
+            function changeToPrevSection(callback = null) {
+                sectionNo--;
+                if(sectionNo >= 0) {
                     justChangedSection = true;
+                    changeToSectionOfPage(sectionNo * sectionOffset + 1, "FLAG_PREV",
+                        function() {
+                            //when prev page loaded scroll to bottom
+                            window.scrollTo(0,document.body.scrollHeight);
+                            if(callback)
+                                callback();
+                        });
+                } else {
+                    console.log("cannot go prev sectionNo:" + sectionNo);
+                    sectionNo = 0;
                 }
-
-                function changeToPrevSection(callback = null) {
-                    sectionNo--;
-                    if(sectionNo >= 0) {
-                        justChangedSection = true;
-                        changeToSectionOfPage(sectionNo * sectionOffset + 1, "FLAG_PREV",
-                            function() {
-                                //when prev page loaded scroll to bottom
-                                window.scrollTo(0,document.body.scrollHeight);
-                                if(callback)
-                                    callback();
-                            });
-                    } else {
-                        console.log("cannot go prev sectionNo:" + sectionNo);
-                        sectionNo = 0;
-                    }
-                }
-
-                function isAtPageBottom() {
-                    return (window.innerHeight + window.scrollY) >= document.body.offsetHeight; 
-                }
-
-                function isAtPageTop() {
-                    return $(window).scrollTop() <= 0;
-                }
-
-                $( document ).ready(function() {
+            }
 
 
-                    //GET FIRST PARAGRAF-1 ON CURRENT SCROLL
-                    function getElementByTopOffset(selector, offsetTop){
-                        return $(selector).filter(function( index, elem) {
-                           return $(elem).offset().top >= offsetTop;
-                        }).first();
-                    }
+            function isAtPageBottom() {
+                return (window.innerHeight + window.scrollY) >= document.body.offsetHeight; 
+            }
 
-                    
-                    changeToSectionOfPage(1, "FLAG_JUMP");
+            function isAtPageTop() {
+                return $(window).scrollTop() <= 0;
+            }
 
-                    //DETECT SCROLL STOPPING
-                    $(window).scroll(function() {
+           //GET FIRST PARAGRAF-1 ON CURRENT SCROLL
+            function getElementByTopOffset(selector, offsetTop){
+                return $(selector).filter(function( index, elem) {
+                   return $(elem).offset().top >= offsetTop;
+                }).first();
+            }
 
-                        clearTimeout($.data(this, 'scrollTimer'));
-                        $.data(this, 'scrollTimer', setTimeout(function() {
+            $( document ).ready(function() {
 
-                            $("p").removeClass("highlighted");
+
+             
+                
+                changeToSectionOfPage(1, "FLAG_JUMP");
+                firstLoading = false;
+
+                //DETECT SCROLL STOPPING
+                $(window).scroll(function() {
+
+                    clearTimeout($.data(this, 'scrollTimer'));
+                    $.data(this, 'scrollTimer', setTimeout(function() {
+
+                        $("p").removeClass("highlighted");
+                        
+                        console.log("Haven't scrolled in 250ms!");
+
+                        // if reached to the bottom, load the new section
+                        // if(isAtPageBottom() && !justChangedSection) {
+                        //     changeToNextSection();
+                        //     window.androidInterface.sectionChangeFinished(sectionNo, "SIDE_OTHER");
+                        // } else if (isAtPageTop() && !justChangedSection) {
+                        //     changeToPrevSection();
+                        //     window.androidInterface.sectionChangeFinished(sectionNo, "SIDE_OTHER");
+                        // } else {
+
+                            justChangedSection = false;
+
+                            var currentPrg = getElementByTopOffset(".Paragraf-1", $(window).scrollTop());
                             
-                            console.log("Haven't scrolled in 250ms!");
+                            currentPrg.addClass("highlighted");
+                            currentPrg.nextUntil(currentPrg.nextAll(".Paragraf-1").first(), ".Paragraf-2").addClass("highlighted");
 
-                            // if reached to the bottom, load the new section
-                            // if(isAtPageBottom() && !justChangedSection) {
-                            //     changeToNextSection();
-                            //     window.androidInterface.sectionChangeFinished(sectionNo, "SIDE_OTHER");
-                            // } else if (isAtPageTop() && !justChangedSection) {
-                            //     changeToPrevSection();
-                            //     window.androidInterface.sectionChangeFinished(sectionNo, "SIDE_OTHER");
-                            // } else {
-
-                                justChangedSection = false;
-
-                                var currentPrg = getElementByTopOffset(".Paragraf-1", $(window).scrollTop());
-                                
-                                currentPrg.addClass("highlighted");
-                                currentPrg.nextUntil(currentPrg.nextAll(".Paragraf-1").first(), ".Paragraf-2").addClass("highlighted");
-
-                                var activeParagraphDistanceToWindow = currentPrg.offset().top - $(window).scrollTop();
-                                window.androidInterface.scrollFinished(currentPrg.attr("name"), "SIDE_OTHER", activeParagraphDistanceToWindow);                                
-                            // }
+                            var activeParagraphDistanceToWindow = currentPrg.offset().top - $(window).scrollTop();
+                            window.androidInterface.scrollFinished(currentPrg.attr("name"), "SIDE_OTHER", activeParagraphDistanceToWindow);                                
+                        // }
 
 
-                        }, 250));
-                    });
-
-                    // LUGAT POPUP WHEN LONG PRESSED
-                    $(".Paragraf-1, .Paragraf-2").on("contextmenu",function(){
-                        console.log("JSINT WORKY contextmenu" );
-                        console.log($(this).text());
-                        window.androidInterface.receiveSelectedText(window.getSelection().toString(), $(this).text(), "ENG");
-                    });
-
-                    // COLLECT ALL FIHRIST NAMES
-                    var fihristIds = [];
-                    var fihristNames = [];
-                    $("[name^='fihrist-']").filter(function() {return $(this).text().length > 0})
-                        .each(function() { 
-                            // console.log($(this).text()) 
-                            fihristIds.push($(this).attr("name"));
-                            fihristNames.push($(this).text());
-                        } );
-                    // window.androidInterface.receiveFihrist(fihristIds, fihristNames);
-                    
+                    }, 250));
                 });
 
-        </script>
+
+
+
+                // COLLECT ALL FIHRIST NAMES
+                // var fihristIds = [];
+                // var fihristNames = [];
+                // $("[name^='fihrist-']").filter(function() {return $(this).text().length > 0})
+                //     .each(function() { 
+                //         // console.log($(this).text()) 
+                //         fihristIds.push($(this).attr("name"));
+                //         fihristNames.push($(this).text());
+                //     } );
+                // // window.androidInterface.receiveFihrist(fihristIds, fihristNames);
+                
+            });
+
+
+    </script>
 
 
 </head>

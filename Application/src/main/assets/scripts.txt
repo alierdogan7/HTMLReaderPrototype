@@ -1,3 +1,11 @@
+// GET PAGE NUMBERS OF FIHRIST ITEMS
+$("[name^='fihrist-']").each(function() {
+	console.log($(this).parent().prevAll("a.pageNumber").first().text() 
+						+ " - " + $(this).text().toUpperCase().trim()  )
+})
+
+
+
 for( x in document.getElementsByClassName('Alt-Başlık')) {
 	var inText = document.getElementsByClassName('Alt-Başlık')[x].innerHTML;
 	document.getElementsByClassName('Alt-Başlık')[x].innerHTML = "<a class='fihrist' name='fihrist-" + x + "'>" + inText + "</a>";

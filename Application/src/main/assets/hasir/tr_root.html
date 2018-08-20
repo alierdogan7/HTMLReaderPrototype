@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Onuncu_Söz_son</title>
-    <link href="css/idGeneratedStyles.css" rel="stylesheet" type="text/css">
+    <link href="../css/idGeneratedStyles.css" rel="stylesheet" type="text/css">
     <script src="../jquery-3.3.1.min.js"></script>
     <meta charset="utf-8">
     <script type="text/javascript">
@@ -11,45 +11,64 @@
                 var sectionOffset = 10;
                 var sectionLang = "TR";
                 var justChangedSection = false; //prevent isAtPageTop get fired when new section loaded and scroll is at the top
+                var firstLoading = true;
 
                 var rootUrl = "file:///android_asset/hasir/";
                 // var rootUrl = "http://localhost:9000/hasir/";
 
-             function changeToSectionOfPage(page, flag, callback = null) {
-                    var currSectionStart = parseInt(page / sectionOffset) * sectionOffset + 1;
-
-                    //load the first section
-                    console.log("loading " + currSectionStart);
-                    
-                    $("#container").html("");
-                    $("#container").load(rootUrl + "hasr-" + sectionLang + "-" + currSectionStart + "-" + (currSectionStart+sectionOffset-1) + ".html", function() {
-                            if(callback)
-                                callback();
-
-                            var nextBt = $("<button>==></button>").attr("class", "navButton").click(function() {changeToNextSection() });
-                            var prevBt = $("<button><==</button>").attr("class", "navButton").click(function() {changeToPrevSection() });
-
-                            if(sectionNo < lastSection)
-                                $("#container").append(nextBt);
-                            if(sectionNo >= 1)
-                                $("#container").prepend(prevBt);
-
-                           window.androidInterface.sectionChangeFinished(sectionNo, "SIDE_TR", flag);    
-                    });
+                // LUGAT POPUP WHEN LONG PRESSED
+                function onContextMenuListener() {
+                    console.log("JSINT WORKY contextmenu" );
+                    console.log($(this).text());
+                    window.androidInterface.receiveSelectedText(window.getSelection().toString(), $(this).text(), "TR");
                 }
 
-                function changeToSection(sectionToChanged, callback = null) {
+            function changeToSectionOfPage(page, flag, callback = null, fihristName = "") {
+                
+                var currSectionStart = parseInt((page-1) / sectionOffset) * sectionOffset + 1;
+
+                //load the first section
+                console.log("loading " + currSectionStart);
+                
+                $("#container").html("");
+                $("#container").load(rootUrl + "hasr-" + sectionLang + "-" + currSectionStart + "-" + (currSectionStart+sectionOffset-1) + ".html", function() {
+                        if(callback)
+                            callback();
+
+                        var nextBt = $("<button>==></button>").attr("class", "navButton").click(function() {changeToNextSection() });
+                        var prevBt = $("<button><==</button>").attr("class", "navButton").click(function() {changeToPrevSection() });
+
+                        if(sectionNo < lastSection)
+                            $("#container").append(nextBt);
+                        if(sectionNo >= 1)
+                            $("#container").prepend(prevBt);
+
+                        // for lugat popup
+                        $(".Paragraf-1, .Paragraf-2").on("contextmenu", onContextMenuListener);
+
+                        if(fihristName.length > 0)
+                            location.hash = "#" + fihristName;
+
+                       window.androidInterface.sectionChangeFinished(sectionNo, "SIDE_TR", flag);    
+                });
+            }
+
+            function changeToSection(sectionToChanged, fihristName = "", callback = null) {
+                if(sectionNo == parseInt(sectionToChanged)) {
+                    console.log("the page is already in current section, NOT RELOADING");
+                    if(fihristName.length > 0)
+                        location.hash = "#" + fihristName;
+                    return;
+                } else {
                     sectionNo = parseInt(sectionToChanged);
-                    if (sectionNo >= 0) {
-                        var page = (sectionNo) * sectionOffset + 1;
-                        changeToSectionOfPage(page, "FLAG_JUMP", function() {
-                                //when prev page loaded scroll to bottom
-                                window.scrollTo(0,0);
-                                if(callback)
-                                    callback();
-                            }); 
-                    }
                 }
+
+                if (sectionNo >= 0) {
+                    var page = (sectionNo) * sectionOffset + 1;
+                    changeToSectionOfPage(page, "FLAG_JUMP", callback, fihristName); 
+                }
+            }
+
 
                 function changeToNextSection(callback = null) {
                     sectionNo++;
@@ -88,18 +107,21 @@
                     return $(window).scrollTop() <= 0;
                 }
 
+                //GET FIRST PARAGRAF-1 ON CURRENT SCROLL
+                function getElementByTopOffset(selector, offsetTop){
+                    return $(selector).filter(function( index, elem) {
+                       return $(elem).offset().top >= offsetTop;
+                    }).first();
+                }
+
+                    
+
                 $( document ).ready(function() {
 
 
-                    //GET FIRST PARAGRAF-1 ON CURRENT SCROLL
-                    function getElementByTopOffset(selector, offsetTop){
-                        return $(selector).filter(function( index, elem) {
-                           return $(elem).offset().top >= offsetTop;
-                        }).first();
-                    }
-
                     
                     changeToSectionOfPage(1, "FLAG_JUMP");
+                    firstLoading = false;
 
                     //DETECT SCROLL STOPPING
                     $(window).scroll(function() {
@@ -135,23 +157,19 @@
                         }, 250));
                     });
 
-                    // LUGAT POPUP WHEN LONG PRESSED
-                    $(".Paragraf-1, .Paragraf-2").on("contextmenu",function(){
-                        console.log("JSINT WORKY contextmenu" );
-                        console.log($(this).text());
-                        window.androidInterface.receiveSelectedText(window.getSelection().toString(), $(this).text(), "TR");
-                    });
+
+
 
                     // COLLECT ALL FIHRIST NAMES
-                    var fihristIds = [];
-                    var fihristNames = [];
-                    $("[name^='fihrist-']").filter(function() {return $(this).text().length > 0})
-                        .each(function() { 
-                            // console.log($(this).text()) 
-                            fihristIds.push($(this).attr("name"));
-                            fihristNames.push($(this).text());
-                        } );
-                    // window.androidInterface.receiveFihrist(fihristIds, fihristNames);
+                    // var fihristIds = [];
+                    // var fihristNames = [];
+                    // $("[name^='fihrist-']").filter(function() {return $(this).text().length > 0})
+                    //     .each(function() { 
+                    //         // console.log($(this).text()) 
+                    //         fihristIds.push($(this).attr("name"));
+                    //         fihristNames.push($(this).text());
+                    //     } );
+                    // // window.androidInterface.receiveFihrist(fihristIds, fihristNames);
                     
                 });
 
