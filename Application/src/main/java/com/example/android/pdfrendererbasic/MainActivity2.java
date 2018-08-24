@@ -361,6 +361,8 @@ public class MainActivity2 extends AppCompatActivity {
 
     public int getNumberFromAnchor(String anchor) {
         int hyphen = anchor.lastIndexOf('-');
+        if(hyphen < 0)
+            return 0;
         return Integer.parseInt(anchor.substring(hyphen + 1));
     }
 
@@ -390,62 +392,42 @@ public class MainActivity2 extends AppCompatActivity {
                 boolean bestSuitableWordFound = false;
                 //longest prefix is at the first position in the array
 
-                switch (prefices.size()) {
-                    case 6:
-                        candidateWords = App.getDatabase().wordDao()
-                                .getAllPrefixCandidateLugatMatchesOrderedByLength6Prefix(language,
-                                        prefices.get(0), prefices.get(1), prefices.get(2),
-                                        prefices.get(3), prefices.get(4), prefices.get(5));
-                        break;
-                    case 5:
-                        candidateWords = App.getDatabase().wordDao()
-                                .getAllPrefixCandidateLugatMatchesOrderedByLength5Prefix(language,
-                                        prefices.get(0), prefices.get(1), prefices.get(2),
-                                        prefices.get(3), prefices.get(4));
-                        break;
-                    case 4:
-                        candidateWords = App.getDatabase().wordDao()
-                                .getAllPrefixCandidateLugatMatchesOrderedByLength4Prefix(language,
-                                        prefices.get(0), prefices.get(1), prefices.get(2),
-                                        prefices.get(3));
-                        break;
-                    case 3:
-                        candidateWords = App.getDatabase().wordDao()
-                                .getAllPrefixCandidateLugatMatchesOrderedByLength3Prefix(language,
-                                        prefices.get(0), prefices.get(1), prefices.get(2));
-                        break;
-                    case 2:
+                int size = prefices.size();
+                for (int i = prefices.size() - 1; !bestSuitableWordFound;) {
+                    if(i > 0) {
                         candidateWords = App.getDatabase().wordDao()
                                 .getAllPrefixCandidateLugatMatchesOrderedByLength2Prefix(language,
-                                        prefices.get(0), prefices.get(1));
-                        break;
-                    case 1:
+                                        prefices.get(size - i), prefices.get(size - i - 1));
+                    } else if (i == 0){ // if we reached the last prefix to be searched i.e. prefices[0]
+                        // if the last prefix is used, probably a short word should be found from dict, so fetch a short-to-long order result set
                         candidateWords = App.getDatabase().wordDao()
-                                .getAllPrefixCandidateLugatMatchesOrderedByLength1Prefix(language,
-                                        prefices.get(0));
+                                .getAllPrefixCandidateLugatMatchesAscOrderedByLength1Prefix(language,
+                                        prefices.get(size - 1));
+                    } else {
+                        // if i < 0 it means that we couldn't find any single thing
                         break;
-                    case 0:
-                    default:
-                        candidateWords = null;
-                        break;
-                }
+                    }
 
-                if (candidateWords != null && candidateWords.size() > 0) {
+                    if (candidateWords != null && candidateWords.size() > 0) {
 
-                    // start from the longest matched word, i.e. "risale" (because array received from db is sorted)
-                    for (Word word : candidateWords) {
-                        if (normalizedParagraph.contains(word.simpleWord)) { // means that the best suiting word found
-                            dialogMessage.append(word.fullWord + ": ");
+                        // start from the longest matched word, i.e. "risale" (because array received from db is sorted)
+                        for (Word word : candidateWords) {
+                            if (normalizedParagraph.contains(word.simpleWord)) { // means that the best suiting word found
+                                dialogMessage.append(word.fullWord + ": ");
 
-                            if (word.definition.length() > 100)
-                                dialogMessage.append(word.definition.substring(0, 100) + " ...");
-                            else
-                                dialogMessage.append(word.definition);
+                                String def = App.getDatabase().wordDao().getDefinitionOfWord(word.id);
+                                if (def.length() > 100)
+                                    dialogMessage.append(def.substring(0, 100) + " ...");
+                                else
+                                    dialogMessage.append(def);
 
-                            bestSuitableWordFound = true;
-                            break;
+                                bestSuitableWordFound = true;
+                                break;
+                            }
                         }
                     }
+
+                    i = i - 2;
                 }
 
                 if (bestSuitableWordFound) {
