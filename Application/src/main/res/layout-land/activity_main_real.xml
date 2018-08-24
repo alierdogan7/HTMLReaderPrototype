@@ -5,11 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    tools:context="com.example.android.pdfrendererbasic.MainActivity"
+    tools:context="com.example.android.pdfrendererbasic.MainActivity2"
     android:id="@+id/MotherLinearLayout"
     >
 
 
+    <com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
+        android:id="@+id/swipyOther"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        app:srl_direction="both">
     <WebView
         android:id="@+id/ingWV"
         android:layout_width="match_parent"
@@ -21,7 +27,7 @@
         android:padding="10dp"
         >
 
-    </WebView>
+    </WebView></com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 
     <TextView
         android:layout_width="10dp"
@@ -29,6 +35,12 @@
         android:background="@color/cardview_shadow_start_color"
         android:foreground="@color/cardview_shadow_start_color"/>
 
+    <com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
+    android:id="@+id/swipyTR"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    app:srl_direction="both">
     <WebView
         android:id="@+id/trVW"
         android:layout_width="match_parent"
@@ -37,7 +49,7 @@
         tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="8dp"
         android:layout_weight="1"
-        android:padding="10dp"/>
+        android:padding="10dp"/></com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 
 
 

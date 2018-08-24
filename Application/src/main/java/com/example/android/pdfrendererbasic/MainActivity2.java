@@ -1,72 +1,66 @@
 package com.example.android.pdfrendererbasic;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.Toast;
+
+import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity2 extends AppCompatActivity {
 
     public static final String FRAGMENT_PDF_RENDERER_BASIC = "pdf_renderer_basic";
     WebView webViewEN;
     WebView webViewTR;
     Context mContext;
-    Button nextButton;
-    Button prevButton;
     Button zoomPlus;
     Button zoomMinus;
     boolean fihristMod = false;
     int currPage;
     int currFihrist;
-    ArrayList<Integer> pageSizesWebViewEN;
-    ArrayList<Integer> pageSizesWebViewTR;
-    ArrayList<Integer> pageTopsWebViewTR;
-    ArrayList<Integer> pageTopsWebViewEN;
     boolean engLoaded = false;
     boolean trLoaded = false;
     boolean onAnimationTRSide = false;
     boolean onAnimationOtherSide = false;
-    ScaleGestureDetector sgd;
+    int currentSection = 0;
+    int currentZoom = 100;
+    String currentParagraphId = null;
+    String currentPageId = null;
+    final int lastSection = 2;
+    int sectionPageOffset = 10;
+    final String rootUrl = "file:///android_asset/hasir/";
 
-    enum Side {Turkish, OtherLang, Neutral}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_real);
+
         if (savedInstanceState == null) {
 //            getSupportFragmentManager().beginTransaction()
 //                    .add(R.id.container, new PdfRendererBasicFragment(),
@@ -74,15 +68,37 @@ public class MainActivity extends AppCompatActivity {
 //                    .commit();
             mContext = this;
             prepareButtons();
-            prepareWebViews();
+            prepareUI();
+            initWebViews();
+            loadWebViews(currentSection, null);
 
 
         } else {
             //do something for restoring webview states
             mContext = this;
 //            prepareButtons();
-            prepareWebViews();
+            currentSection = savedInstanceState.getInt("currentSection", 0);
+            currentParagraphId = savedInstanceState.getString("currentParagraphId", null);
+            currentPageId = savedInstanceState.getString("currentPageId ", null);
+            currentZoom = savedInstanceState.getInt("currentZoom ", currentZoom);
+            prepareUI();
+            initWebViews();
+            loadWebViews(currentSection, currentParagraphId);
 
+
+        }
+    }
+
+    public void prepareUI() {
+        // Hide the status bar.
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+
+        // Put the action bar there.
+        if (getSupportActionBar() != null) {
+            if(currentPageId != null)
+                getSupportActionBar().setTitle("Page " +  getNumberFromAnchor(currentPageId));
         }
     }
 
@@ -93,13 +109,45 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("currentSection", currentSection);
+        outState.putString("currentParagraphId", currentParagraphId);
+        outState.putString("currentPageId ", currentPageId );
+        outState.putInt("currentZoom ", currentZoom);
+        super.onSaveInstanceState(outState);
     }
 
-    public void prepareWebViews() {
+//    @Override
+//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        currentSection = savedInstanceState.getInt("currentSection", 0);
+//     }
+
+    public void initWebViews() {
         webViewEN = (WebView) findViewById(R.id.ingWV);
         webViewTR = (WebView) findViewById(R.id.trVW);
+        SwipyRefreshLayout swipyEN = (SwipyRefreshLayout) findViewById(R.id.swipyOther);
+        SwipyRefreshLayout swipyTR = (SwipyRefreshLayout) findViewById(R.id.swipyTR);
+        swipyEN.setDistanceToTriggerSync(30);
+        swipyTR.setDistanceToTriggerSync(30);
+
+        SwipyRefreshLayout.OnRefreshListener refreshListener = new SwipyRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh(SwipyRefreshLayoutDirection direction) {
+                swipyEN.setRefreshing(false);
+                swipyTR.setRefreshing(false);
+
+                if (direction == SwipyRefreshLayoutDirection.TOP ) {
+                    loadWebViews(currentSection - 1, null);
+                } else {
+                    loadWebViews(currentSection + 1, null);
+                }
+
+            }
+        };
+
+        swipyEN.setOnRefreshListener(refreshListener);
+        swipyTR.setOnRefreshListener(refreshListener);
 
         if (Build.VERSION.SDK_INT >= 19) {
             webViewEN.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -109,8 +157,6 @@ public class MainActivity extends AppCompatActivity {
             webViewTR.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
 
-        webViewEN.loadUrl("file:///android_asset/hasir/eng_root.html");
-//        webViewEN.loadUrl("file:///android_asset/hasir/hasr-ENG-tashihli.html");
         webViewEN.getSettings().setBuiltInZoomControls(true);
         webViewEN.getSettings().setDisplayZoomControls(true);
         webViewEN.getSettings().setJavaScriptEnabled(true);
@@ -123,12 +169,37 @@ public class MainActivity extends AppCompatActivity {
         webViewTR.getSettings().setDisplayZoomControls(false);
         webViewEN.getSettings().setSupportZoom(false);
         webViewTR.getSettings().setSupportZoom(false);
-        webViewTR.loadUrl("file:///android_asset/hasir/tr_root.html");
-//        webViewTR.loadUrl("file:///android_asset/hasir/hasr-TR-tashihli.html");
+        webViewEN.getSettings().setTextZoom(currentZoom);
+        webViewTR.getSettings().setTextZoom(currentZoom);
+
 
         webViewEN.addJavascriptInterface(new MyJavaScriptInterface(this), "androidInterface");
         webViewTR.addJavascriptInterface(new MyJavaScriptInterface(this), "androidInterface");
 
+
+    }
+
+    public void loadWebViews(int sectionNo, String goToAnchor) {
+
+        if (sectionNo < 0 || sectionNo > lastSection)
+            return;
+
+        boolean willScrollBottom;
+
+        // if this func. triggered by prev. button, scroll to bottom after loading
+        if(sectionNo == currentSection - 1)
+            willScrollBottom = true;
+        else
+            willScrollBottom = false;
+
+        engLoaded = false;
+        trLoaded = false;
+        currentSection = sectionNo;
+
+        webViewEN.loadUrl(rootUrl + "hasr-ENG-section-" + sectionNo + ".html");
+        webViewTR.loadUrl(rootUrl + "hasr-TR-section-" + sectionNo + ".html");
+//        webViewEN.loadUrl("file:///android_asset/hasir/hasr-ENG-tashihli.html");
+//        webViewTR.loadUrl("file:///android_asset/hasir/hasr-TR-tashihli.html");
         webViewEN.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
@@ -136,6 +207,13 @@ public class MainActivity extends AppCompatActivity {
                     return;
 
                 engLoaded = true;
+                onAnimationOtherSide = false;
+                if(goToAnchor != null) {
+                    scrollToAnchor(webViewEN, goToAnchor);
+                    scrollToAnchor(webViewTR, goToAnchor);
+                }
+                else if (willScrollBottom)
+                    webViewEN.scrollTo(0, webViewEN.getContentHeight());
 
             }
 
@@ -155,17 +233,21 @@ public class MainActivity extends AppCompatActivity {
                     return;
 
                 trLoaded = true;
+                onAnimationTRSide = false;
+                if(goToAnchor != null) {
+                    scrollToAnchor(webViewEN, goToAnchor);
+                    scrollToAnchor(webViewTR, goToAnchor);
+                }
+                else if (willScrollBottom)
+                    webViewTR.scrollTo(0, webViewTR.getContentHeight());
             }
 
         });
 
+    }
 
-//        webViewEN.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-//            @Override
-//            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-//
-//            }
-//        });
+    public void scrollToAnchor(WebView wv, String anchorId) {
+        wv.evaluateJavascript("$('html, body').animate({ scrollTop: $(\"[name='" + anchorId + "']\" ).offset().top - 15}, 50);", null);
     }
 
     public void prepareButtons() {
@@ -275,6 +357,11 @@ public class MainActivity extends AppCompatActivity {
 
         return word.toLowerCase();
 
+    }
+
+    public int getNumberFromAnchor(String anchor) {
+        int hyphen = anchor.lastIndexOf('-');
+        return Integer.parseInt(anchor.substring(hyphen + 1));
     }
 
     public void showLugatDefinition(String word, String paragraph, String language) {
@@ -397,11 +484,14 @@ public class MainActivity extends AppCompatActivity {
                 int newZoom = webViewEN.getSettings().getTextZoom() + 20;
                 webViewEN.getSettings().setTextZoom(newZoom);
                 webViewTR.getSettings().setTextZoom(newZoom);
+                currentZoom = newZoom;
                 return true;
             case R.id.zoomMinus:
                 newZoom = webViewEN.getSettings().getTextZoom() - 20;
                 webViewEN.getSettings().setTextZoom(newZoom);
                 webViewTR.getSettings().setTextZoom(newZoom);
+                currentZoom = newZoom;
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -449,19 +539,16 @@ public class MainActivity extends AppCompatActivity {
 //        vw.evaluateJavascript("changeToSection(" + section + ", '" + bookmark.bookmarkId + "');", null);// (val) -> {
 //                            Toast.makeText(, bookmark.name, Toast.LENGTH_SHORT).show();
 //        });
+
+
     }
 
     class MyJavaScriptInterface {
 
         private Context ctx;
-        private String lastActiveParagraphId;
-        private Side currentScroller;
-
 
         MyJavaScriptInterface(Context ctx) {
             this.ctx = ctx;
-            this.lastActiveParagraphId = "";
-            this.currentScroller = Side.Neutral;
         }
 
         @android.webkit.JavascriptInterface
@@ -475,7 +562,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @android.webkit.JavascriptInterface
-        public void scrollFinished(String activeParagraphId, String side, String activeParagraphDistanceToWindow) {
+        public void scrollFinished(String activeParagraphId, String side,
+                                   String activeParagraphDistanceToWindow,
+                                   String activePageId) {
 //            if(currentScroller != Side.Neutral)
 //                return;
 
@@ -489,6 +578,16 @@ public class MainActivity extends AppCompatActivity {
 //                                        && !lastActiveParagraphId.equals(activeParagraphId)) {
 //                            lastActiveParagraphId = activeParagraphId  + "";
                         onAnimationTRSide = true;
+                        currentParagraphId = activeParagraphId + "";
+                        currentPageId = activePageId + "";
+                        if (getSupportActionBar() != null) {
+                            if(currentPageId != null)
+                                getSupportActionBar().setTitle("Page " +  getNumberFromAnchor(currentPageId));
+                        }
+
+                        Log.d("JSINT", "currPrgId: " + currentParagraphId + " / currPage: " + currentPageId);
+
+
                         webViewTR.evaluateJavascript("$('html, body').animate({ scrollTop: $(\"p[name='" +
 //                                        activeParagraphId + "']\" ).offset().top - 15}, 500); " +
                                         activeParagraphId + "']\" ).offset().top - " + activeParagraphDistanceToWindow + "}, 500, " + "function() { setTimeout(function() { window.androidInterface.animationFinished(\"SIDE_TR\"); },  500)});" +
@@ -503,8 +602,6 @@ public class MainActivity extends AppCompatActivity {
                                         "currentPrg.nextUntil(currentPrg.nextAll(\".Paragraf-1\").first(), \".Paragraf-2\").addClass(\"highlighted\");\n"
                                 , (val) -> {
                                     //callback function
-                                    Log.d("JSINTERFACE", "currScrol" + currentScroller);
-                                    Log.d("JSINTERFACE", "lastActivePrg" + lastActiveParagraphId);
                                     Log.d("JSINTERFACE", "activePrg" + activeParagraphId);
                                 });
 //                            currentScroller = Side.Neutral;
@@ -525,6 +622,15 @@ public class MainActivity extends AppCompatActivity {
 //                                && !lastActiveParagraphId.equals(activeParagraphId)) {
 //                            lastActiveParagraphId = activeParagraphId + "";
                         onAnimationOtherSide = true;
+                        currentParagraphId = activeParagraphId + "";
+                        currentPageId = activePageId + "";
+                        if (getSupportActionBar() != null) {
+                            if(currentPageId != null)
+                                getSupportActionBar().setTitle("Page " +  getNumberFromAnchor(currentPageId));
+                        }
+
+
+                        Log.d("JSINT", "currPrgId: " + currentParagraphId + " / currPage: " + currentPageId);
                         webViewEN.evaluateJavascript("$('html, body').animate({ scrollTop: $(\"p[name='" +
 //                                        activeParagraphId + "']\" ).offset().top - 15}, 500);" +
                                         activeParagraphId + "']\" ).offset().top - " + activeParagraphDistanceToWindow + "}, 500, " + "function() { setTimeout(function() { window.androidInterface.animationFinished(\"SIDE_OTHER\"); },  500)});" +
@@ -538,8 +644,6 @@ public class MainActivity extends AppCompatActivity {
 
                                 , (val) -> {
                                     //callback function
-                                    Log.d("JSINTERFACE", "currScrol" + currentScroller);
-                                    Log.d("JSINTERFACE", "lastActivePrg" + lastActiveParagraphId);
                                     Log.d("JSINTERFACE", "activePrg" + activeParagraphId);
 
                                 });
@@ -566,40 +670,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        @android.webkit.JavascriptInterface
-        public void sectionChangeFinished(String sectionNo, String side, String flag) {
-            if (side.equals("SIDE_TR") && !onAnimationTRSide) {
-                onAnimationOtherSide = true;
-                runOnUiThread(() -> {
-                    String command = "";
-                    if (flag.equals("FLAG_JUMP"))
-                        command = "changeToSection(" + sectionNo + ",";
-                    else if (flag.equals("FLAG_PREV"))
-                        command = "changeToPrevSection(";
-                    else if (flag.equals("FLAG_NEXT"))
-                        command = "changeToNextSection(";
-
-                    webViewEN.evaluateJavascript(command +
-                            "function() { setTimeout(function() { window.androidInterface.animationFinished(\"SIDE_OTHER\"); },  500)});", null);
-
-                });
-            } else if (side.equals("SIDE_OTHER") && !onAnimationOtherSide) {
-                onAnimationTRSide = true;
-                runOnUiThread(() -> {
-                    String command = "";
-                    if (flag.equals("FLAG_JUMP"))
-                        command = "changeToSection(" + sectionNo + ", '', ";
-                    else if (flag.equals("FLAG_PREV"))
-                        command = "changeToPrevSection(";
-                    else if (flag.equals("FLAG_NEXT"))
-                        command = "changeToNextSection(";
-
-                    webViewTR.evaluateJavascript(command +
-                            "function() { setTimeout(function() { window.androidInterface.animationFinished(\"SIDE_TR\"); },  500)});", null);
-
-                });
-            }
-        }
+//        @android.webkit.JavascriptInterface
+//        public void doSectionChange(int newSectionNo) {
+//            runOnUiThread(() -> {
+//                loadWebViews(newSectionNo, null);
+//            });
+//        }
 
         @android.webkit.JavascriptInterface
         public void receiveSelectedText(String word, String paragraph, String language) {
@@ -608,6 +684,7 @@ public class MainActivity extends AppCompatActivity {
 //                Toast.makeText(getApplicationContext(), "SELECTED: " + paragraph, Toast.LENGTH_SHORT).show();
 //            });
         }
+
     }
 }
 

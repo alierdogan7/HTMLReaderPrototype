@@ -1,5 +1,6 @@
 package com.example.android.pdfrendererbasic;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,11 +27,8 @@ public class FihristArrayAdapter extends ArrayAdapter<Bookmark> {
     private WebView webView1;
     private WebView webView2;
 
-    public FihristArrayAdapter(@NonNull Context context, @NonNull List<Bookmark> bookmarks, WebView wv1, WebView wv2, DialogFragment dialog) {
+    public FihristArrayAdapter(@NonNull Context context, @NonNull List<Bookmark> bookmarks, DialogFragment dialog) {
         super(context, 0, bookmarks);
-
-        this.webView1 = wv1;
-        this.webView2 = wv2;
         this.context = context;
         this.bookmarks = bookmarks;
         this.dialog = dialog;
@@ -49,9 +47,12 @@ public class FihristArrayAdapter extends ArrayAdapter<Bookmark> {
         View.OnClickListener jumpPageListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    MainActivity.goToFihrist(b, webView1);
-                    MainActivity.goToFihrist(b, webView2);
-                    dialog.dismiss();
+                //calc. the page is on which section
+                int page = b.pageNumber;
+                int offset = ((MainActivity2) context).sectionPageOffset;
+                int section = Math.max(0, page - 1) / offset;
+                ((MainActivity2) context).loadWebViews(section, b.anchorId);
+                dialog.dismiss();
 
             }
         };

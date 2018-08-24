@@ -13,10 +13,10 @@ public class Bookmark {
     String name;
     int pageNumber;
     float position;
-    String bookmarkId;
+    String anchorId;
 
-    public Bookmark(String bookmarkId, String bookId, Date date, String name, int pageNumber) {
-        this.bookmarkId = bookmarkId;
+    public Bookmark(String anchorId, String bookId, Date date, String name, int pageNumber) {
+        this.anchorId = anchorId;
         this.bookId = bookId;
         this.date = date;
         this.name = name;

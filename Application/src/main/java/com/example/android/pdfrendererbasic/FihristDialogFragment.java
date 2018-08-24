@@ -47,10 +47,10 @@ public class FihristDialogFragment extends DialogFragment {
 //            Log.d("fihrist", b.name + "," + b.pageNumber);
 //        }
 
-        WebView webViewEN = (WebView) getActivity().findViewById(R.id.ingWV);
-        WebView webViewTR = (WebView) getActivity().findViewById(R.id.trVW);
+//        WebView webViewEN = (WebView) getActivity().findViewById(R.id.ingWV);
+//        WebView webViewTR = (WebView) getActivity().findViewById(R.id.trVW);
         List<Bookmark> fihrist = MainActivity.getFihrist(bookId);
-        final FihristArrayAdapter bAdapter = new FihristArrayAdapter(getContext(), fihrist, webViewEN, webViewTR ,this);
+        final FihristArrayAdapter bAdapter = new FihristArrayAdapter(getActivity(), fihrist,this);
         // we passed bookId through Bundle in arguments of Fragment
         bookmarkLV.setAdapter(bAdapter);
 
