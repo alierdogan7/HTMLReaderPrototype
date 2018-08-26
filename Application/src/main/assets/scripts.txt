@@ -1,3 +1,9 @@
+// ASSIGN PARAGRAPH ID'S
+$(".Paragraf-1").not(".IgnorePrg").each(function(index) { 
+$(this).html("<h3>#" + index + "</h3>" + $(this).html());
+	$(this).attr("name", "prg-" + index);
+});
+
 // GET PAGE NUMBERS OF FIHRIST ITEMS
 $("[name^='fihrist-']").each(function() {
 	console.log($(this).parent().prevAll("a.pageNumber").first().text() 
@@ -87,6 +93,13 @@ function getElementByTopOffset(selector, offsetTop){
     }).first();
 }
 
+// get prev pageAralik elt in current scroll
+function getPrevElementByTopOffset(selector, offsetTop){
+    return $(selector).filter(function( index, elem) {
+       return $(elem).offset().top <= offsetTop;
+    }).last();
+}
+
 getElementByTopOffset(".Paragraf-1", $(window).scrollTop()).attr("name");
 
 //DETECT SCROLL STOPPING
@@ -164,3 +177,86 @@ $('html, body').animate({ scrollTop: $("p[name='prg-12']" ).offset().top - 15}, 
             "var currentPrg = $(\"p[name='" + activeParagraphId + "']\"); \n" +
             "currentPrg.addClass(\"highlighted\");" +
             "currentPrg.nextUntil(currentPrg.nextAll(\".Paragraf-1\").first(), \".Paragraf-2\").addClass(\"highlighted\");\n"
+
+
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+/// PYTHON SCRIPT FOR GENERATING SEPARATE SECTIONS FROM FULL TEXT ///
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+
+boiler1 = """
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <title>%s</title>
+    <link href="../css/idGeneratedStyles.css" rel="stylesheet" type="text/css">
+    <script src="../jquery-3.3.1.min.js"></script>
+    <meta charset="utf-8">
+    <script type="text/javascript">
+
+        var sideLabel = "SIDE_%s";
+        var langLabel = "%s";
+        var sectionNo = %d;
+        var lastSection = %d;
+
+    </script>
+    <script src="root.js"></script>
+
+
+</head>
+<body id="Onuncu_So-z_son" xml:lang="en-US">
+<div id="container" class="_idGenObjectStyleOverride-1">
+
+<section id="%s">
+
+"""
+
+boiler2 = """
+</section>
+
+
+<a name="bottom"></a>
+</div>
+
+</body></html>
+"""
+
+# side = "TR"
+# lang = "TR"
+side = "OTHER"
+lang = "ENG"
+lastSection = 20
+currSection = 0
+offset = 10
+new_file_path = "/home/burak/AndroidStudioProjects/HTMLReaderPrototype/Application/src/main/assets/hasir/gen/"
+page_separator_html = "<hr class=\"sayfaAralik\"><a class=\"pageNumber\" name=\"page-%d\">#%d</a>"
+# orig_file_path = "/home/burak/AndroidStudioProjects/HTMLReaderPrototype/Application/src/main/assets/hasir/hasr-TR-tashihli.html"
+orig_file_path = "/home/burak/AndroidStudioProjects/HTMLReaderPrototype/Application/src/main/assets/hasir/hasr-ENG-tashihli.html"
+
+with open(orig_file_path, 'r') as orig_file:
+    fullhtml = orig_file.read()
+
+    end_page_separator_index = 0 #initilazition
+
+    for currSection in range(0, lastSection + 1):
+#     for currSection in range(0, 5):
+        filename = "hasr-%s-section-%d.html" % (lang, currSection)
+
+        with open(new_file_path + filename, "w") as new_file:
+            new_file.write(boiler1 % (filename, side, lang, currSection, lastSection, filename[:-5]))
+
+            # parse the corresponding portion of html from orig file
+            start_page = (currSection * offset) + 1
+            end_page = ((currSection + 1) * offset) + 1
+            start_page_separator_index = fullhtml.find(page_separator_html % (start_page, start_page), end_page_separator_index)
+            end_page_separator_index = fullhtml.find(page_separator_html % (end_page, end_page), start_page_separator_index)
+            if(start_page_separator_index != -1 and end_page_separator_index != -1):
+                portion_html = fullhtml[start_page_separator_index:end_page_separator_index]
+                new_file.write(portion_html)
+
+
+            new_file.write(boiler2)
+
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////

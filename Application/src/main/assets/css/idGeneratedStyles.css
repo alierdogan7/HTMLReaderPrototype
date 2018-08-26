@@ -246,11 +246,11 @@ span.Arabi-Dahili {
 	font-weight:500;
 	text-transform:none;
 }
-span.Haşiye {
+p.Haşiye {
 	font-family:Souvenir, serif;
-	font-size:0.833em;
-	font-style:normal;
-	font-weight:bold;
+	font-style:italic;
+	color: green;
+	/*font-weight:bold;*/
 }
 span.Koyu {
 	font-family:Souvenir, serif;

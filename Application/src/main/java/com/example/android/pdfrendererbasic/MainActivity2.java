@@ -51,7 +51,7 @@ public class MainActivity2 extends AppCompatActivity {
     int currentZoom = 100;
     String currentParagraphId = null;
     String currentPageId = null;
-    final int lastSection = 2;
+    final int lastSection = 20;
     int sectionPageOffset = 10;
     final String rootUrl = "file:///android_asset/hasir/";
 
@@ -138,7 +138,7 @@ public class MainActivity2 extends AppCompatActivity {
                 swipyTR.setRefreshing(false);
 
                 if (direction == SwipyRefreshLayoutDirection.TOP ) {
-                    loadWebViews(currentSection - 1, null);
+                    loadWebViews(currentSection - 1, "bottom");
                 } else {
                     loadWebViews(currentSection + 1, null);
                 }
@@ -184,13 +184,12 @@ public class MainActivity2 extends AppCompatActivity {
         if (sectionNo < 0 || sectionNo > lastSection)
             return;
 
-        boolean willScrollBottom;
-
+//        boolean willScrollBottom;
         // if this func. triggered by prev. button, scroll to bottom after loading
-        if(sectionNo == currentSection - 1)
-            willScrollBottom = true;
-        else
-            willScrollBottom = false;
+//        if(sectionNo == currentSection - 1)
+//            willScrollBottom = true;
+//        else
+//            willScrollBottom = false;
 
         engLoaded = false;
         trLoaded = false;
@@ -212,8 +211,8 @@ public class MainActivity2 extends AppCompatActivity {
                     scrollToAnchor(webViewEN, goToAnchor);
                     scrollToAnchor(webViewTR, goToAnchor);
                 }
-                else if (willScrollBottom)
-                    webViewEN.scrollTo(0, webViewEN.getContentHeight());
+//                else if (willScrollBottom)
+//                    webViewEN.scrollTo(0, webViewEN.getContentHeight());
 
             }
 
@@ -238,8 +237,8 @@ public class MainActivity2 extends AppCompatActivity {
                     scrollToAnchor(webViewEN, goToAnchor);
                     scrollToAnchor(webViewTR, goToAnchor);
                 }
-                else if (willScrollBottom)
-                    webViewTR.scrollTo(0, webViewTR.getContentHeight());
+//                else if (willScrollBottom)
+//                    webViewTR.scrollTo(0, webViewTR.getContentHeight());
             }
 
         });
@@ -389,11 +388,12 @@ public class MainActivity2 extends AppCompatActivity {
 
 
                 List<Word> candidateWords = null;
-                boolean bestSuitableWordFound = false;
+                boolean searchWillStartWithShortestWord = false;
+                Word longestMatch = null;
                 //longest prefix is at the first position in the array
 
                 int size = prefices.size();
-                for (int i = prefices.size() - 1; !bestSuitableWordFound;) {
+                for (int i = prefices.size() - 1; longestMatch == null;) {
                     if(i > 0) {
                         candidateWords = App.getDatabase().wordDao()
                                 .getAllPrefixCandidateLugatMatchesOrderedByLength2Prefix(language,
@@ -403,34 +403,39 @@ public class MainActivity2 extends AppCompatActivity {
                         candidateWords = App.getDatabase().wordDao()
                                 .getAllPrefixCandidateLugatMatchesAscOrderedByLength1Prefix(language,
                                         prefices.get(size - 1));
+                        searchWillStartWithShortestWord = true;
                     } else {
                         // if i < 0 it means that we couldn't find any single thing
                         break;
                     }
 
                     if (candidateWords != null && candidateWords.size() > 0) {
-
                         // start from the longest matched word, i.e. "risale" (because array received from db is sorted)
                         for (Word word : candidateWords) {
                             if (normalizedParagraph.contains(word.simpleWord)) { // means that the best suiting word found
-                                dialogMessage.append(word.fullWord + ": ");
-
-                                String def = App.getDatabase().wordDao().getDefinitionOfWord(word.id);
-                                if (def.length() > 100)
-                                    dialogMessage.append(def.substring(0, 100) + " ...");
-                                else
-                                    dialogMessage.append(def);
-
-                                bestSuitableWordFound = true;
-                                break;
+                                if(searchWillStartWithShortestWord) { //if search starts with shortest, search until longest match
+                                    longestMatch = word;
+                                } else { //if search starts from longest candidate, pick the first matching candidate and exit loop
+                                    longestMatch = word;
+                                    break;
+                                }
                             }
                         }
+                    }
+
+                    if(longestMatch != null) {
+                        dialogMessage.append(longestMatch.fullWord + ": ");
+                        String def = App.getDatabase().wordDao().getDefinitionOfWord(longestMatch.id);
+                        if (def.length() > 100)
+                            dialogMessage.append(def.substring(0, 100) + " ...");
+                        else
+                            dialogMessage.append(def);
                     }
 
                     i = i - 2;
                 }
 
-                if (bestSuitableWordFound) {
+                if (longestMatch != null) {
                     runOnUiThread(() -> {
                         AlertDialog dialog = new AlertDialog.Builder(mContext).setMessage(dialogMessage).create();
                         dialog.getWindow().setDimAmount(0);
